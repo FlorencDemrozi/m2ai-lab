@@ -9,7 +9,7 @@
 
 export type Box = { x: number; y: number; z: number; w: number; d: number; h: number };
 export type Pt = [number, number];
-export type SceneObject = Box & { object?: string; kind: string; count?: number };
+export type SceneObject = Box & { object?: string; kind: string; count?: number; points?: Array<[number, number]> };
 
 const S = 46; // pixels per metre
 const C = Math.cos(Math.PI / 6);
@@ -108,8 +108,13 @@ export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
         { x: x + w * 0.2, y: y + d * 0.2, z: z + h, w: w * 0.6, d: d * 0.6, h: 0.16 },
       ]);
     case 'camera-array': {
-      const n = o.count ?? 8;
       const c = 0.2;
+      // Explicit ceiling positions (from the floor plan): cameras only.
+      if (o.points) {
+        const cams = o.points.map(([cx, cy]) => ({ x: cx - c / 2, y: cy - c / 2, z: z - h, w: c, d: c, h }));
+        return { boxes: cams, groups: cams.map((b) => [b]) };
+      }
+      const n = o.count ?? 8;
       const t = 0.05; // truss thickness
       const truss: Box[] = [
         { x, y, z, w, d: t, h: t },
@@ -120,11 +125,39 @@ export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
       const cams = perimeter(x, y, w, d, n).map(([cx, cy]) => ({ x: cx - c / 2, y: cy - c / 2, z: z - c, w: c, d: c, h: c + 0.04 }));
       return { boxes: [...truss, ...cams], groups: cams.map((b) => [b]) };
     }
+    case 'pc': {
+      // Two monitors on the desk (the given box is the first) and a tower on the floor north of the desk.
+      const boxes: Box[] = [
+        { x, y, z, w, d, h },
+        { x, y: y - d - 0.04, z, w, d, h },
+        { x: x + 0.03, y: y - 1.0, z: 0, w: 0.24, d: 0.42, h: 0.5 },
+      ];
+      return one(boxes);
+    }
+    case 'operator-desk': {
+      // Desk row: legs + top, then per position a monitor (west edge, facing east) and a chair.
+      const n = o.count ?? 1;
+      const boxes = deskBoxes(o);
+      for (let i = 0; i < n; i++) {
+        const py = y + d - 0.66 - i * 0.8;
+        boxes.push({ x: x + 0.1, y: py, z: z + h, w: 0.08, d: 0.36, h: 0.29 });
+        boxes.push({ x: x + 0.73, y: py + 0.0, z: 0.3, w: 0.38, d: 0.4, h: 0.06 });
+        boxes.push({ x: x + 0.88, y: py + 0.16, z: 0, w: 0.06, d: 0.06, h: 0.3 });
+        boxes.push({ x: x + 1.05, y: py, z: 0.36, w: 0.06, d: 0.4, h: 0.4 });
+      }
+      return one(boxes);
+    }
+    case 'cabinets': {
+      const n = o.count ?? 1;
+      const step = d / n;
+      const boxes = Array.from({ length: n }, (_, i) => ({ x, y: y + i * step + 0.02, z, w, d: step - 0.04, h }));
+      return one(boxes);
+    }
     case 'anchors': {
       const n = o.count ?? 4;
       const a = 0.14;
       const corners4: Array<[number, number]> = [[x, y], [x + w, y], [x + w, y + d], [x, y + d]];
-      const at = n === 4 ? corners4 : perimeter(x, y, w, d, n);
+      const at = o.points ?? (n === 4 ? corners4 : perimeter(x, y, w, d, n));
       const boxes = at.map(([ax, ay]) => ({ x: Math.min(ax, x + w - a), y: Math.min(ay, y + d - a), z, w: a, d: a, h }));
       return { boxes, groups: boxes.map((b) => [b]) };
     }

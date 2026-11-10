@@ -47,6 +47,7 @@ const org = {
     <div class="glow" aria-hidden="true"></div>
     <div class="wrap hero-grid">
       <div class="hero-text">
+        <img class="hero-mark" src={`${import.meta.env.BASE_URL}logo-mark-dark.png`} alt="" width="45" height="64" />
         <p class="eyebrow">{pick(s.institution, locale)}</p>
         <h1 id="hero-h">
           <Wordmark name={s.lab_name} class="big" />
@@ -185,6 +186,7 @@ const org = {
   }
   .hero-grid { position: relative; display: grid; gap: var(--space-7); align-items: center; }
   .hero .eyebrow { color: var(--ink-soft); }
+  .hero-mark { display: block; height: 64px; width: auto; margin-bottom: var(--space-4); }
   h1 { margin-bottom: var(--space-4); }
   h1 :global(.big) { display: block; font-size: clamp(2.6rem, 1rem + 4.6vw, 5.25rem); line-height: 0.95; }
   .full { display: block; font-size: var(--step-1); font-weight: 500; color: var(--ink-soft); letter-spacing: -0.005em; margin-top: var(--space-3); max-width: 30ch; }

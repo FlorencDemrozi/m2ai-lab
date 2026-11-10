@@ -24,10 +24,8 @@ const other = locale === 'en' ? 'nb' : 'en';
 <header class="site-header">
   <div class="wrap bar">
     <a class="logo" href={href(locale)}>
-      <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
-        <path d="M1 5c5 0 7 7 15 7M1 19c5 0 7-7 15-7M1 12h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        <path d="M16 12h4l2-6 3 12 2-6h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
+      <img class="mark mark-light" src={`${import.meta.env.BASE_URL}logo-mark.png`} alt="" width="28" height="40" />
+      <img class="mark mark-dark" src={`${import.meta.env.BASE_URL}logo-mark-dark.png`} alt="" width="28" height="40" />
       <Wordmark name={lab.settings.lab_name} />
     </a>
     <nav aria-label={t('nav.primary')}>
@@ -101,7 +99,14 @@ const other = locale === 'en' ? 'nb' : 'en';
     font-size: 1.15rem;
     color: var(--ink); text-decoration: none; min-height: 44px;
   }
-  .logo svg { color: var(--accent); }
+  .mark { height: 40px; width: auto; }
+  .mark-dark { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .mark-light { display: none; }
+    :global(:root:not([data-theme='light'])) .mark-dark { display: block; }
+  }
+  :global(:root[data-theme='dark']) .mark-light { display: none; }
+  :global(:root[data-theme='dark']) .mark-dark { display: block; }
 
   .menu summary {
     list-style: none; cursor: pointer; display: grid; place-items: center;

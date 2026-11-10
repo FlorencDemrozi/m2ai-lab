@@ -6,7 +6,6 @@ status: planned
 categories: [computing]
 researchers: [florenc-demrozi]
 applications: []
-twin_object: research_storage
 order: 220
 placeholder: true
 ---

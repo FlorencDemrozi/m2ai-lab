@@ -15,12 +15,12 @@
   --bg: #f5f6f8;
   --bg-raised: #ffffff;
   --bg-sunken: #e9ecf1;
-  --ink: #0b1220;
+  --ink: #001a3c;
   --ink-soft: #4a5468;
   --line: #d3d8e1;
   --line-strong: #7a8396;
 
-  --accent: #006d77;
+  --accent: #00727a;
   --accent-ink: #ffffff;
   --accent-soft: #d5f1f0;
   --glow: #12c9bb;
@@ -41,11 +41,14 @@
   --sig-1: #12c9bb;
   --sig-2: #ff7a59;
   --sig-3: #9b8cff;
-  --sig-4: #ffd166;
+  --sig-4: #f5a200;
   --sig-5: #ff5d8f;
   --sig-6: #5ab8ff;
   --sig-7: #7ee081;
-  --grid-line: rgb(11 18 32 / 0.06);
+  --grid-line: rgb(0 26 60 / 0.06);
+  /* Logo colours (navy = --ink in light mode). Orange is decorative only. */
+  --brand-teal: #00797f;
+  --brand-orange: #f5a200;
 
   --font-display: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter Variable', 'Segoe UI', system-ui, sans-serif;

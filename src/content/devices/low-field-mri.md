@@ -6,7 +6,6 @@ status: planned
 categories: [medical-imaging]
 researchers: [mahdieh-khanmohammadi, ketil-oppedal]
 applications: [parkinsons, digital-biomarkers, aging-aal]
-twin_object: low_field_mri
 order: 190
 placeholder: true
 ---

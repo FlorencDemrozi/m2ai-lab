@@ -48,8 +48,14 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 ## Images and 3D
 
 - [ ] Hero render and 2D isometric twin image (both from the same Blender model and camera).
-- [ ] **2D twin layout** (`src/content/twin.yaml`): room size (10 × 11 × 3.2 m), every device position and the
-      capture-volume position are guesses. Needs the floor plan; until then the twin says "illustrative".
+- [x] **2D twin layout** (`src/content/twin.yaml`) now follows `docs/Lab-Map.png` and `docs/UiS_Lab_Interactive_3D.html`.
+- [ ] Only **10 of the 12 OptiTrack cameras** have positions on the map; place the other 2.
+- [ ] Provisional positions in the twin: thermal tripods, USRP antenna stands, EMG dock and VR headset (shown on the
+      cabinets), and all planned devices.
+- [ ] The 3D model also lists an **OptiTrack eSync 2**, a **PoE switch** and a **charging station**, which are not in the
+      inventory. Add them as devices?
+- [ ] Logo subtitle says "Multimodal AI Lab"; the site's full name is "Multimodal AI Biomedical Data Analysis
+      Laboratory". Which one is right?
 - [ ] Floor plan, ceiling height, camera positions or a scan of room KE E-470. The OptiTrack zone's position in the room (`src/content/zones/capture-volume.yaml`) is a placeholder.
 - [ ] Device photos.
 - [ ] UiS logo files and visual-profile rules. The colours and fonts in `src/styles/tokens.css` are provisional.

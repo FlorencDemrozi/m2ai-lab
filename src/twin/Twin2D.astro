@@ -63,9 +63,22 @@ const minY = Math.min(...corners.map((c) => c[1])) - pad;
 const maxY = Math.max(...corners.map((c) => c[1])) + pad;
 const vb = `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}`;
 
+// Floor: the bounding rectangle minus an excluded area in the front-right (south-east) corner.
+const ex = scene.room.exclude.find((e) => Math.abs(e.x + e.w - W) < 0.01 && Math.abs(e.y + e.d - D) < 0.01);
+const floor = ex
+  ? pts([[0, 0], [W, 0], [W, ex.y], [ex.x, ex.y], [ex.x, D], [0, D]].map(([fx, fy]) => project(fx, fy, 0)))
+  : floorRect(0, 0, W, D);
 const grid: string[] = [];
-for (let gx = 1; gx < W; gx++) grid.push(pts([project(gx, 0, 0), project(gx, D, 0)]));
-for (let gy = 1; gy < D; gy++) grid.push(pts([project(0, gy, 0), project(W, gy, 0)]));
+for (let gx = 1; gx < W; gx++) grid.push(pts([project(gx, 0, 0), project(gx, ex && gx > ex.x ? ex.y : D, 0)]));
+for (let gy = 1; gy < D; gy++) grid.push(pts([project(0, gy, 0), project(ex && gy > ex.y ? ex.x : W, gy, 0)]));
+const excluded = scene.room.exclude.map((e) => {
+  const f = boxFaces({ x: e.x, y: e.y, z: 0, w: e.w, d: e.d, h: 0.3 });
+  const c = project(e.x + e.w / 2, e.y + e.d / 2, 0.3);
+  return { f, c, label: e.label ? pick(e.label, locale) : '' };
+});
+const DOOR_H = Math.min(2.1, H);
+const doors = scene.room.doors.map((dr) => pts([project(dr.x, 0, 0), project(dr.x + dr.w, 0, 0), project(dr.x + dr.w, 0, DOOR_H), project(dr.x, 0, DOOR_H)]));
+const notes = scene.room.notes.map((n) => ({ p: project(n.x, n.y, n.z), text: pick(n.text, locale) }));
 const wallBack = pts([project(0, 0, 0), project(W, 0, 0), project(W, 0, H), project(0, 0, H)]);
 const wallLeft = pts([project(0, 0, 0), project(0, D, 0), project(0, D, H), project(0, 0, H)]);
 
@@ -89,11 +102,25 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
       <div class="stage" data-stage>
         <div class="scroller">
         <svg viewBox={vb} role="group" aria-label={t('twin.map')}>
+          <defs>
+            <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="8" height="8" class="hatch-bg" />
+              <line x1="0" y1="0" x2="0" y2="8" class="hatch-line" />
+            </pattern>
+          </defs>
           <g class="room" aria-hidden="true">
-            <polygon class="wall" points={wallBack} />
+            <polygon class:list={['wall', { glass: scene.room.back_wall === 'glass' }]} points={wallBack} />
+            {doors.map((dp) => <polygon class="door" points={dp} />)}
             <polygon class="wall" points={wallLeft} />
-            <polygon class="floor" points={floorRect(0, 0, W, D)} />
+            <polygon class="floor" points={floor} />
             {grid.map((g) => <polyline class="grid" points={g} />)}
+            {excluded.map((e) => (
+              <g class="excluded">
+                <polygon points={e.f.side} /><polygon points={e.f.front} /><polygon class="ex-top" points={e.f.top} />
+                {e.label && <text x={e.c[0].toFixed(1)} y={(e.c[1] + 4).toFixed(1)} text-anchor="middle">{e.label}</text>}
+              </g>
+            ))}
+            {notes.map((n) => <text class="note" x={n.p[0].toFixed(1)} y={n.p[1].toFixed(1)} text-anchor="middle">{n.text}</text>)}
           </g>
           <g class="zones" aria-hidden="true">
             {lab.zones.map((z) => <polygon class="zone" points={floorRect(z.data.rect.x, z.data.rect.y, z.data.rect.width, z.data.rect.depth)} />)}
@@ -299,6 +326,13 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
   .wall { fill: color-mix(in srgb, var(--bg-raised) 70%, transparent); stroke: var(--line); stroke-width: 1; }
   .floor { fill: color-mix(in srgb, var(--bg-raised) 85%, var(--bg)); stroke: var(--line-strong); stroke-width: 1; }
   .grid { fill: none; stroke: var(--grid-line); stroke-width: 1; }
+  .wall.glass { fill: color-mix(in srgb, var(--accent) 7%, transparent); stroke: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .door { fill: color-mix(in srgb, var(--ink-soft) 16%, transparent); stroke: var(--line-strong); stroke-width: 1; }
+  .excluded polygon { fill: var(--bg-sunken); stroke: var(--line); stroke-width: 1; }
+  .excluded .ex-top { fill: url(#hatch); }
+  .hatch-bg { fill: var(--bg-sunken); }
+  .hatch-line { stroke: var(--line); stroke-width: 3; }
+  .excluded text, .note { fill: var(--ink-soft); font: 500 12px var(--font-body); letter-spacing: 0.02em; }
   .zone {
     fill: color-mix(in srgb, var(--glow) 12%, transparent);
     stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 6 4;

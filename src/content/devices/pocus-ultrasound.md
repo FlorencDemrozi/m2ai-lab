@@ -6,7 +6,6 @@ status: planned
 categories: [medical-imaging]
 researchers: [morteza-esmaeili]
 applications: [rehabilitation, sports, digital-biomarkers]
-twin_object: pocus_ultrasound
 order: 180
 placeholder: true
 ---

@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UiS · Interactive lab model</title>
+<style>
+:root{color-scheme:light;--bg:#eef3f7;--panel:#fff;--ink:#132d43;--muted:#50677b;--border:#cbd9e4;--accent:#00757b}body.dark{color-scheme:dark;--bg:#101a25;--panel:#182738;--ink:#eef6ff;--muted:#b5c9db;--border:#3a5269;--accent:#72e4de}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,sans-serif}main{max-width:1400px;margin:auto;padding:26px}header small{color:var(--accent);font-weight:800;letter-spacing:.12em}h1{margin:5px 0;font-size:clamp(26px,4vw,44px)}p{color:var(--muted);line-height:1.5;margin:8px 0}.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;margin-top:20px}.stage,aside{background:var(--panel);border:1px solid var(--border);border-radius:15px;overflow:hidden}.bar{display:flex;flex-wrap:wrap;gap:7px;padding:12px;border-bottom:1px solid var(--border)}button,select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:7px 10px}button{cursor:pointer}button:hover,button[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}canvas{display:block;width:100%;height:clamp(365px,63vh,700px);touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.hint{margin:0;padding:10px 14px;border-top:1px solid var(--border);font-size:13px}aside{padding:18px}#related{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}#related button{font-size:12px;text-align:left}#qty,#location{color:var(--ink)}h2{font-size:18px;margin:0 0 10px}select{width:100%}#detail{min-height:130px;margin-top:16px}hr{border:0;border-top:1px solid var(--border);margin:16px 0}.note{font-size:13px}label{align-self:center;white-space:nowrap;font-size:13px}#caption{font-size:13px}@media(max-width:800px){main{padding:14px}.layout{grid-template-columns:1fr}}
+</style>
+<main><header><small>UNIVERSITY OF STAVANGER</small><h1>Multimodal AI Lab</h1><p>E‑470 · Interactive room model</p></header>
+<div class="layout"><section class="stage" aria-label="Interactive lab scene"><div class="bar">
+<button data-view="iso" aria-pressed="true">Isometric</button><button data-view="top" aria-pressed="false">Top down</button><button data-view="desk" aria-pressed="false">Operator view</button>
+<button id="minus" aria-label="Zoom out">−</button><button id="plus" aria-label="Zoom in">+</button>
+<label><input id="cones" type="checkbox"> Camera cones</label><label><input id="roof" type="checkbox"> Ceiling</label><button id="theme" aria-pressed="false">Dark mode</button></div>
+<canvas id="scene" tabindex="0" aria-label="3D lab. Arrow keys rotate. Use the equipment list for details."></canvas><p class="hint">Drag to rotate · Scroll or use + / − to zoom · Select a device for details</p></section>
+<aside><h2>Explore equipment</h2><p class="note">Select an item in the model or browse the full equipment list below.</p><select id="pick" aria-label="Equipment or area"></select><div id="detail" aria-live="polite"><strong id="name"></strong><p id="desc"></p><p id="qty" class="note"></p><p id="location" class="note"></p><div id="related"></div></div><hr><h2>Layout reference</h2><p class="note">The blue area marks the 5.0 × 8.0 m capture zone. E‑470B is shown for context and is outside the lab.</p><p class="note">10 camera symbols are plotted from the drawing. The two additional planned cameras are unplaced. Viewing cones are schematic.</p><p class="note">Portable devices appear in the equipment list. Any setup locations shown there are descriptive or provisional.</p></aside></div></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), cv=$('scene'),ctx=cv.getContext('2d'), sel=$('pick');
+let yaw=-.42, tilt=.91, zoom=1, W,H, scale, current='area', faces=[], hits=[];
+const objects={}, geometry=[];
+function item(id,title,desc,group='Room and capture layout',qty='',location=''){objects[id]={title,desc,group,qty,location}}
+function poly(v,c,id='',edge='#203c522b'){geometry.push({v,c,id,edge})}
+function box(x,y,z,w,d,h,c,id=''){let v=[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z],[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]];
+[[0,3,2,1],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]].forEach((f,i)=>poly(f.map(j=>v[j]),Array.isArray(c)?c[i]:c,id))}
+item('area','OptiTrack capture area','5.0 × 8.0 m, with a 2.6 m ceiling. The same open area supports gait, upper-body, seated and balance tasks.');
+item('excluded','E‑470B','Adjacent room, 2.8 × 2.87 m as labelled. Outside the lab.');
+item('desk','Operator workstations','Five workstation positions illustrated along the edge of the capture area.');
+item('storage','Equipment storage','Storage cabinets along the east side, outside the capture area.');
+item('sink','Sink','Located at the northwest corner.');
+item('glass','North glass wall','Two doors are shown in the north glass wall.');
+item('south','South windows','Windows along the south wall of the lab, ending at the E‑470B cutout.');
+item('adjacent','Door to nearby lab','Separate doorway at the northeast corner, as shown in the reference.');
+const wall=['#b9c5ce','#e7edf1','#d7dfe6','#c0cdd6','#cad5de','#adbfc9'], desk=['#9e6844','#efc58c','#d7a875','#ba885b','#d7a875','#ba885b'];
+box(0,0,-.14,6.1,8.77,.14,'#c6d0d8');
+box(6.1,2.87,-.14,2.8,5.9,.14,'#c6d0d8');
+box(6.1,0,-.13,2.8,2.87,.12,'#f0e9dc','excluded');
+poly([[.65,.37,.009],[5.65,.37,.009],[5.65,8.37,.009],[.65,8.37,.009]],'#a4daef','area','#1478a4');
+for(const [x,y,w,d] of [[.65,.37,5,.035],[.65,8.335,5,.035],[.65,.37,.035,8],[5.615,.37,.035,8]])box(x,y,.01,w,d,.015,'#157ea6','area');
+box(0,0,0,.13,8.77,.36,wall);
+box(8.77,2.87,0,.13,4.85,.36,wall);
+box(6.1,2.87,0,2.8,.12,.36,wall);
+box(6.1,0,0,.12,2.87,.36,wall);
+for(let i=0;i<6;i++)box(.23+i*.96,0,0,.88,.11,.62,'#80b9d7','south');
+for(const [x,w] of [[.14,.86],[2.02,4.58],[7.6,.53]])box(x,8.64,0,w,.11,.67,'#80b9d7','glass');
+for(const x of [1,6.6])box(x,8.64,0,1,.13,.18,'#dbb079','glass');
+box(8.14,8.55,0,.63,.17,.20,'#dbb079','adjacent');
+box(.2,8.06,0,.47,.52,.86,wall,'sink');box(.25,8.12,.86,.37,.37,.035,'#8196a1','sink');
+box(5.82,3.07,.72,.60,4.3,.09,desk,'desk');
+for(let i=0;i<5;i++){let y=3.37+i*.8;box(5.92,y,.81,.08,.36,.29,'#263744','desk');box(6.55,y,.3,.38,.40,.23,'#4f6071','desk');box(6.87,y,.47,.08,.4,.36,'#3c5062','desk')}
+for(let i=0;i<5;i++)box(8.17,3.14+i*.76,0,.59,.70,1.73,wall,'storage');
+const cams=[[.96,8.15],[2.94,8.15],[5.35,8.15],[.83,6.02],[5.35,6.02],[.83,3],[5.35,3],[.86,.6],[3.08,.6],[5.35,.6]];
+cams.forEach(([x,y],i)=>{let id='cam'+(i+1);item(id,'OptiTrack PrimeX 22 · '+(i+1),'Ceiling-mounted motion capture camera. Position estimated from the drawing; height and aim are illustrative.');box(x-.1,y-.095,2.36,.2,.19,.19,['#122b40','#254963','#152e46','#1e3c54','#1e3c54','#1e3c54'],id)});
+const inventory=[
+['unplaced','Additional OptiTrack PrimeX 22 cameras','Complete the planned 12-camera system.','Motion capture and synchronization','2 planned','Mounting positions to be confirmed'],
+['sync','OptiTrack eSync 2','Synchronizes motion capture with compatible external recording systems.','Motion capture and synchronization','1','Control equipment; rack position to be confirmed'],
+['poe','Network / PoE switch','Connects the motion capture cameras to the workstation and supplies power over Ethernet.','Motion capture and synchronization','1','Control equipment; rack position to be confirmed'],
+['thermal49','GST TWIN612G2 · 4.9 mm','Records thermal and visible imagery; intended for a wider view of walking and full-body tasks.','Thermal and radio sensing','1','Movable tripod; proposed gait setup'],
+['thermal7','GST TWIN612G2 · 7 mm','Records thermal and visible imagery for closer views of the face and hands during seated tasks.','Thermal and radio sensing','1','Movable tripod; proposed tabletop setup'],
+['usrp','USRP B210 / B310 radios','Software-defined radios for collecting radio-frequency measurements and investigating device-free sensing.','Thermal and radio sensing','3 units','Movable antenna stands; exact positions to be confirmed'],
+['delsys','Delsys Trigno Avanti','Wearable surface EMG sensors for recording muscle activity during movement and tabletop tasks.','Wearable sensing','16 sensors','Worn by participants; dock in equipment storage'],
+['mindrove','MindRove EMG Armband 2','Forearm EMG bands for recording muscle activity during hand and finger tasks.','Wearable sensing','2 armbands','Worn by participants; kept in equipment storage'],
+['watch','Smartwatches','Wearable sensing for wrist motion and activity; physiological signals depend on the device used.','Wearable sensing','Quantity not specified','Worn by participants; kept in equipment storage'],
+['neon','Pupil Labs Neon','Wearable eye tracker for measuring gaze during seated or movement tasks.','Eye tracking and smart glasses','1','Worn by participants; kept in equipment storage'],
+['aria','Project Aria glasses','Wearable research glasses for capturing egocentric visual and motion data.','Eye tracking and smart glasses','4 pairs','Worn by participants; kept in equipment storage'],
+['vive','HTC VIVE Focus Vision','Headset for immersive experiments, including tasks that use body tracking.','Virtual reality','1 headset','Used in the capture area; kept in equipment storage'],
+['tracker','VIVE Ultimate Trackers','Wearable trackers for tracking body segments in VR experiments.','Virtual reality','3 trackers','Used in the capture area; kept in equipment storage'],
+['pc','Lab workstation','Runs capture and recording software and supports data review and analysis.','Computing and charging','1 tower PC + 2 monitors in the equipment specification','Operator workstation area'],
+['nx','NVIDIA Jetson Orin NX','Edge computer for prototyping local processing and AI on sensor data.','Computing and charging','1','Control equipment; rack position to be confirmed'],
+['nano','NVIDIA Jetson Orin Nano','Edge computer for prototyping sensor acquisition and embedded AI.','Computing and charging','1','Control equipment; rack position to be confirmed'],
+['pi','Raspberry Pi 5','Compact computers for sensor interfaces, acquisition and experimental prototypes.','Computing and charging','3 units','Control equipment; rack position to be confirmed'],
+['charge','Charging station','Keeps wearable sensors and portable devices ready between sessions.','Computing and charging','1 station','Equipment storage']
+];
+inventory.forEach(args=>item(...args));
+const related={area:['unplaced','thermal49','thermal7','usrp','vive','tracker'],desk:['pc','sync','poe','nx','nano','pi'],storage:['delsys','mindrove','watch','neon','aria','vive','tracker','charge']};
+function project(v){let [x,y,z]=v;x-=4.45;y-=4.385;let h=x*Math.cos(yaw)-y*Math.sin(yaw),d=x*Math.sin(yaw)+y*Math.cos(yaw);return [W/2+h*scale,H/2-(d*Math.sin(tilt)+(z-.5)*Math.cos(tilt))*scale,d*Math.cos(tilt)-(z-.5)*Math.sin(tilt)]}
+function path(v){ctx.beginPath();v.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath()}
+function draw(){const r=cv.getBoundingClientRect(),dpi=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;if(!W||!H)return;cv.width=W*dpi;cv.height=H*dpi;ctx.setTransform(dpi,0,0,dpi,0,0);scale=Math.min(W/12.9,H/11.6)*zoom;ctx.fillStyle=document.body.classList.contains('dark')?'#101c29':'#e7eff5';ctx.fillRect(0,0,W,H);faces=geometry.slice();
+if($('roof').checked)faces.push({v:[[0,0,2.6],[6.1,0,2.6],[6.1,2.87,2.6],[8.9,2.87,2.6],[8.9,8.77,2.6],[0,8.77,2.6]],c:'#d3e5f270',edge:'#7c9ab5',id:''});
+if($('cones').checked)cams.forEach(([x,y])=>{let t=[x*.36+3.15*.64,y*.36+4.37*.64],v=[x,y,2.4];let corners=[[t[0]-.5,t[1]-.5,.06],[t[0]+.5,t[1]-.5,.06],[t[0]+.5,t[1]+.5,.06],[t[0]-.5,t[1]+.5,.06]];corners.forEach((c,i)=>faces.push({v:[v,c,corners[(i+1)%4]],c:'#087baf16',edge:'#198cb33c',id:''}))});
+const points=faces.map(o=>({...o,p:o.v.map(project)}));points.sort((a,b)=>depth(b)-depth(a));hits=[];
+function depth(o){return o.p.reduce((s,p)=>s+p[2],0)/o.p.length}
+for(let o of points){path(o.p);ctx.fillStyle=(o.id===current || (o.id && related[o.id]?.includes(current)))&&current!=='area'?'#e5a33e':o.c;ctx.fill();ctx.strokeStyle=o.edge;ctx.lineWidth=1;ctx.stroke();if(o.id)hits.push(o)}
+function label(x,y,z,t){let p=project([x,y,z]);ctx.font='bold '+Math.max(10,scale*.22)+'px system-ui';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#eff7fc';ctx.strokeText(t,p[0],p[1]);ctx.fillStyle='#17364d';ctx.fillText(t,p[0],p[1])}
+label(3.1,4.4,.07,'5.0 × 8.0 m capture area');label(7.5,1.45,.07,'E‑470B · excluded');label(4.5,9.08,.1,'NORTH');label(3.1,-.36,.1,'SOUTH');
+}
+function choose(id){
+ const o=objects[id];if(!o)return;
+ current=id;sel.value=id;$('name').textContent=o.title;$('desc').textContent=o.desc;
+ $('qty').textContent=o.qty?'Quantity: '+o.qty:'';
+ $('location').textContent=o.location?'Setup: '+o.location:'';
+ const list=$('related');list.replaceChildren();
+ for(const key of related[id]||[]){const b=document.createElement('button');b.type='button';b.textContent=objects[key].title;b.onclick=()=>choose(key);list.append(b)}
+ draw()
+}
+const groups=new Map();
+Object.entries(objects).forEach(([id,o])=>{
+ if(!groups.has(o.group)){const g=document.createElement('optgroup');g.label=o.group;groups.set(o.group,g);sel.append(g)}
+ groups.get(o.group).append(new Option(o.title,id))
+});
+sel.onchange=()=>choose(sel.value);
+function view(k){[yaw,tilt]=k==='top'?[0,Math.PI/2]:k==='desk'?[-1.35,.57]:[-.42,.91];zoom=1;document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===k)));draw()}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
+function magnify(f){zoom=Math.max(.62,Math.min(2,zoom*f));draw()}
+$('plus').onclick=()=>magnify(1.16);$('minus').onclick=()=>magnify(1/1.16);$('cones').onchange=draw;$('roof').onchange=draw;$('theme').onclick=()=>{$('theme').setAttribute('aria-pressed',String(document.body.classList.toggle('dark')));draw()};
+cv.onwheel=e=>{e.preventDefault();magnify(Math.exp(-e.deltaY*.001))};
+let drag;
+cv.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,yaw,tilt};cv.setPointerCapture(e.pointerId)};
+cv.onpointermove=e=>{if(!drag)return;let dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)<4)return;yaw=drag.yaw+dx*.009;tilt=Math.max(.18,Math.min(Math.PI/2,drag.tilt+dy*.008));draw()};
+cv.onpointerup=e=>{if(!drag)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<5){let b=cv.getBoundingClientRect();for(let i=hits.length-1;i>=0;i--){path(hits[i].p);let match=ctx.isPointInPath((e.clientX-b.left)*cv.width/b.width,(e.clientY-b.top)*cv.height/b.height);if(match){choose(hits[i].id);break}}}drag=null};
+cv.onpointercancel=()=>drag=null;
+cv.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();yaw+=(e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0)*.1;tilt=Math.max(.18,Math.min(Math.PI/2,tilt+(e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0)*.1));draw()};
+new ResizeObserver(draw).observe(cv);choose('area');
+</script></html>

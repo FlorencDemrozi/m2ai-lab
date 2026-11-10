@@ -207,11 +207,22 @@ const zones = defineCollection({
  * Shapes are drawn as isometric boxes until the Blender render replaces the drawing;
  * hotspots keep working either way. Objects without `object` are decoration.
  */
-const TWIN_KINDS = ['box', 'desk', 'workstation', 'tripod', 'rack', 'cart', 'plate', 'camera-array', 'anchors', 'person', 'scanner'] as const;
+const TWIN_KINDS = ['box', 'desk', 'workstation', 'pc', 'operator-desk', 'cabinets', 'tripod', 'rack', 'cart', 'plate', 'camera-array', 'anchors', 'person', 'scanner'] as const;
 const twin = defineCollection({
   loader: file('./src/content/twin.yaml'),
   schema: z.object({
-    room: z.object({ width: z.number().positive(), depth: z.number().positive(), height: z.number().positive() }),
+    room: z.object({
+      width: z.number().positive(),
+      depth: z.number().positive(),
+      height: z.number().positive(),
+      back_wall: z.enum(['solid', 'glass']).default('solid'),
+      /** Floor areas inside the bounding box that are not part of the lab (e.g. E-470B). */
+      exclude: z.array(z.object({ x: z.number(), y: z.number(), w: z.number(), d: z.number(), label: localized.optional() })).default([]),
+      /** Doors in the back wall: x position and width. */
+      doors: z.array(z.object({ x: z.number(), w: z.number() })).default([]),
+      /** Small orientation labels drawn in the scene. */
+      notes: z.array(z.object({ x: z.number(), y: z.number(), z: z.number().default(0), text: localized })).default([]),
+    }),
     objects: z.array(
       z.object({
         /** Matches a device's `twin_object`. Omit for decoration (furniture, a participant). */
@@ -225,6 +236,8 @@ const twin = defineCollection({
         h: z.number().positive(),
         /** camera-array / anchors: how many units around the rectangle. */
         count: z.number().int().positive().optional(),
+        /** camera-array / anchors: explicit [x, y] floor positions instead of spacing them out. */
+        points: z.array(z.tuple([z.number(), z.number()])).optional(),
       }),
     ),
     placeholder,

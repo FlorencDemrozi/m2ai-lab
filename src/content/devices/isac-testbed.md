@@ -6,7 +6,6 @@ status: planned
 categories: [rf-sensing]
 researchers: [gianfranco-nencioni]
 applications: [har, edge-ai]
-twin_object: isac_testbed
 order: 170
 placeholder: true
 ---

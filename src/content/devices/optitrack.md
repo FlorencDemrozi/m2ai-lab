@@ -22,3 +22,11 @@ Twelve ceiling-mounted PrimeX 22 cameras track reflective markers in three dimen
 need less space. Recordings are synchronized with the lab's other sensors through hardware
 TTL triggers and Lab Streaming Layer, so OptiTrack serves as the ground truth every other
 modality is validated against.
+
+The capture area is 5.0 × 8.0 m with a 2.6 m ceiling. The same open floor supports smaller
+studies, for example:
+
+- full-body gait analysis over the whole 5.0 × 8.0 m area
+- upper-body tests (arms, head) in about 3.0 × 3.0 m
+- sitting activities in about 2.0 × 2.0 m
+- balance tests in about 3.0 × 3.0 m
