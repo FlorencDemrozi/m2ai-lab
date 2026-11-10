@@ -40,10 +40,14 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 
 ## People — `src/content/researchers/`
 
-- [ ] For the 11 researchers carried over from the old site: role, email, UiS profile URL, ORCID, and **consent** to publish their photo and details (`consent: true`).
-      Only Florenc Demrozi has an email so far.
-- [ ] Researcher photos.
-- [ ] Is the list still complete? Should anyone be added or set to `active: false`?
+- [x] 12 researchers (Kjersti Engan added Nov 2026). Role, email, UiS profile link and photo come from each
+      person's public UiS profile; the lab confirmed they agreed to be shown (`consent: true`).
+- [ ] ORCID for each person.
+- [ ] Expertise keywords: carried over from the old site and drafted; Kjersti Engan has none yet. They appear only on
+      each researcher's own page.
+- [ ] English job titles were translated from the Norwegian UiS titles (e.g. Førsteamanuensis → Associate Professor,
+      Førsteamanuensis II → Adjunct Associate Professor). Check them.
+- [ ] Is the list complete? Should anyone be set to `active: false`?
 
 ## Images and 3D
 

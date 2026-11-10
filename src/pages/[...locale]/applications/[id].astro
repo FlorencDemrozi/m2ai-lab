@@ -38,7 +38,7 @@ const projects = lab.application.projects(application);
     {people.length > 0 && (
       <section class="section" aria-labelledby="people-h">
         <h2 id="people-h">{t('application.researchers')}</h2>
-        <ul class="grid" role="list">{people.map((r) => <li><ResearcherCard researcher={r} locale={locale} /></li>)}</ul>
+        <ul class="grid-5" role="list">{people.map((r) => <li><ResearcherCard researcher={r} locale={locale} /></li>)}</ul>
       </section>
     )}
     {projects.length > 0 && (

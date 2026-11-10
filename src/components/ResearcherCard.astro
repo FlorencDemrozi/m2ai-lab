@@ -1,12 +1,13 @@
 ---
+/**
+ * Compact researcher card for grids: photo (only with consent), name and role.
+ * The whole card links to the researcher's page, where expertise and contact details are.
+ */
 import { Image } from 'astro:assets';
-import Email from './Email.astro';
-import Icon from './Icon.astro';
 import type { Researcher } from '../lib/lab';
-import { href, pick, useT, type Locale } from '../i18n/ui';
+import { href, pick, type Locale } from '../i18n/ui';
 interface Props { researcher: Researcher; locale: Locale; level?: 2 | 3 }
 const { researcher, locale, level = 3 } = Astro.props;
-const t = useT(locale);
 const r = researcher.data;
 const H = `h${level}` as 'h2' | 'h3';
 const initials = r.name
@@ -18,50 +19,43 @@ const initials = r.name
 ---
 <article class="researcher">
   {r.photo && r.consent ? (
-    <Image src={r.photo} alt="" width={160} height={160} class="avatar" />
+    <Image src={r.photo} alt="" widths={[200, 400]} sizes="(min-width: 62rem) 200px, 45vw" class="photo" loading="lazy" />
   ) : (
-    <span class="avatar initials" aria-hidden="true">{initials}</span>
+    <span class="photo initials" aria-hidden="true">{initials}</span>
   )}
-  <div class="body">
-    <H class="name"><a href={href(locale, 'researchers', researcher.id)}>{r.name}</a></H>
-    {r.role && <p class="role">{pick(r.role, locale)}</p>}
-    {r.expertise.length > 0 && (
-      <ul class="tags" role="list" aria-label={t('researcher.expertise')}>
-        {r.expertise.map((e) => <li><span class="tag">{e}</span></li>)}
-      </ul>
-    )}
-    <div class="links">
-      {r.email && <Email address={r.email} label={t('researcher.emailTo', { name: r.name })} iconOnly />}
-      {r.profile_url && (
-        <a href={r.profile_url} class="profile">{t('researcher.profile')} <Icon name="external" size={16} /></a>
-      )}
-    </div>
-  </div>
+  <H class="name"><a href={href(locale, 'researchers', researcher.id)}>{r.name}</a></H>
+  {r.role && <p class="role">{pick(r.role, locale)}</p>}
 </article>
 <style>
   .researcher {
-    display: grid;
-    grid-template-columns: 4.5rem 1fr;
-    gap: var(--space-4);
-    align-items: start;
-    padding: var(--space-5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background: var(--bg-raised);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    height: 100%;
+    overflow: hidden;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
   }
-  .avatar { width: 4.5rem; height: 4.5rem; border-radius: 999px; object-fit: cover; }
+  .researcher:hover,
+  .researcher:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+    box-shadow: 0 12px 32px -16px color-mix(in srgb, var(--glow) 50%, transparent);
+  }
+  @media (hover: hover) { .researcher:hover { transform: translateY(-2px); } }
+  .photo { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; background: var(--bg-sunken); }
   .initials {
     display: grid; place-items: center;
     background: var(--accent-soft); color: var(--ink);
-    font-family: var(--font-display); font-weight: 600; font-size: var(--step-1);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--step-3);
   }
-  .name { margin: 0 0 var(--space-1); font-size: var(--step-1); }
+  .name { margin: var(--space-3) var(--space-4) var(--space-1); font-size: var(--step-0); line-height: 1.3; overflow-wrap: anywhere; }
   .name a { color: inherit; text-decoration: none; }
   .name a:hover { text-decoration: underline; }
-  .role { color: var(--ink-soft); margin: 0 0 var(--space-3); }
-  .tags { list-style: none; padding: 0; margin: var(--space-2) 0 0; }
-  .links { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-3); }
-  .links:empty { display: none; }
-  .profile { display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; }
+  /* The name link covers the whole card. */
+  .name a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .name a:focus-visible { outline: none; }
+  .name a:focus-visible::after { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .role { margin: 0 var(--space-4) var(--space-4); color: var(--ink-soft); font-size: var(--step--1); }
 </style>

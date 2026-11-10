@@ -28,7 +28,8 @@ const highlights = h.highlights
 const nowAvailable = available(lab.labDevices, { accessories: false });
 const tiles = lab.featuredCategories.map((c) => ({ c, items: available(lab.category.devices(c), { accessories: false }) }));
 const apps = lab.applications.map((a) => ({ a, n: available(lab.application.devices(a)).length }));
-const people = lab.researchers.filter((r) => r.data.active).slice(0, 6);
+// Two full rows of five on desktop; everyone is on the researchers page.
+const people = lab.researchers.filter((r) => r.data.active).slice(0, 10);
 
 const org = {
   '@context': 'https://schema.org',
@@ -146,7 +147,7 @@ const org = {
       <h2 id="people-h">{pick(h.researchers_heading, locale)}</h2>
       <a class="all" href={href(locale, 'researchers')}>{t('home.allResearchers')} <Icon name="arrow" size={18} /></a>
     </div>
-    <ul class="grid" role="list">
+    <ul class="grid-5" role="list">
       {people.map((r) => <li><ResearcherCard researcher={r} locale={locale} /></li>)}
     </ul>
   </section>

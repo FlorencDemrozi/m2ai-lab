@@ -16,7 +16,7 @@ const people = lab.researchers.filter((r) => r.data.active);
     <p class="lede">{t('researchers.description')}</p>
   </div>
   <div class="wrap">
-    <ul class="grid" role="list">
+    <ul class="grid-5" role="list">
       {people.map((r) => <li><ResearcherCard researcher={r} locale={locale} level={2} /></li>)}
     </ul>
   </div>
