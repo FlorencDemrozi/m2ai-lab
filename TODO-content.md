@@ -25,6 +25,10 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
       depth cameras, open-source EEG, screen eye tracker, microphone array, wearable microphones, UWB, ISAC testbed,
       low-field MRI, POCUS, research storage). Keep, confirm or delete each; researchers and applications are guesses.
 - [ ] Device photos (our own; no manufacturer images). Until then cards use icons.
+- [x] New items (Nov 2026), all available: multispectral LED illuminator, 20 × WitMotion WT901WIFI (WiFi model),
+      100 × BLE coin-size sensors (built in-house), Samsung 98-inch display on the west wall.
+- [ ] Still missing for them: illuminator model and wavelengths, which sensors the BLE coins carry, display model.
+- [x] Control station: lab workstation with two 28-inch monitors (in its specs and in the twin).
 
 ## Text
 
@@ -48,6 +52,7 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 - [ ] English job titles were translated from the Norwegian UiS titles (e.g. Førsteamanuensis → Associate Professor,
       Førsteamanuensis II → Adjunct Associate Professor). Check them.
 - [ ] Is the list complete? Should anyone be set to `active: false`?
+- [ ] `docs/Multimodal_AI_Lab_researcher_survey.xlsx` (kept out of git) will be used to fill in precise researcher details.
 
 ## Images and 3D
 

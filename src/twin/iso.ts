@@ -126,11 +126,12 @@ export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
       return { boxes: [...truss, ...cams], groups: cams.map((b) => [b]) };
     }
     case 'pc': {
-      // Two monitors on the desk (the given box is the first) and a tower on the floor north of the desk.
+      // Two monitors side by side on the desk (the given box is the southern one) and a tower.
       const boxes: Box[] = [
         { x, y, z, w, d, h },
         { x, y: y - d - 0.04, z, w, d, h },
-        { x: x + 0.03, y: y - 1.0, z: 0, w: 0.24, d: 0.42, h: 0.5 },
+        // Tower on the floor between the desk and the operator's chair.
+        { x: x + 0.5, y: y - 0.45, z: 0, w: 0.22, d: 0.42, h: 0.48 },
       ];
       return one(boxes);
     }

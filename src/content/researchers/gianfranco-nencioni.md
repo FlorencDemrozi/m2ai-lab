@@ -3,7 +3,7 @@ name: "Gianfranco Nencioni"
 expertise:
   - "5G/6G network orchestration"
   - "Integrated sensing & communication (ISAC)"
-order: 8
+order: 12
 # PLACEHOLDER: ORCID and expertise to confirm. Role, email and photo from the public UiS profile (Nov 2026).
 placeholder: true
 # The lab confirmed (Nov 2026) that the researchers agreed to their UiS photo being shown.

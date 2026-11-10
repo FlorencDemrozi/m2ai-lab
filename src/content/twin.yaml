@@ -36,8 +36,10 @@ scene:
       d: 8
       h: 0.19
       points: [[0.96, 0.62], [2.94, 0.62], [5.35, 0.62], [0.83, 2.75], [5.35, 2.75], [0.83, 5.77], [5.35, 5.77], [0.86, 8.17], [3.08, 8.17], [5.35, 8.17]]
-    # Lab workstation: tower + 2 monitors at the north end of the desk row.
-    - { object: gpu_workstation, kind: pc, x: 5.92, y: 1.84, z: 0.81, w: 0.08, d: 0.36, h: 0.29 }
+    # Control station: lab workstation with two 28-inch monitors (0.62 × 0.37 m) at the north end of the desk row.
+    - { object: gpu_workstation, kind: pc, x: 5.92, y: 2.62, z: 0.81, w: 0.06, d: 0.62, h: 0.37 }
+    # Samsung 98-inch display (≈ 2.17 × 1.22 m) on the west wall, facing the control station (confirmed; height provisional).
+    - { object: wall_display, kind: box, x: 0.0, y: 3.3, z: 0.9, w: 0.07, d: 2.17, h: 1.22 }
     # Portable systems are kept in the equipment cabinets (provisional shelf).
     - { object: wireless_emg, kind: box, x: 8.25, y: 4.25, z: 1.73, w: 0.42, d: 0.5, h: 0.12 }
     - { object: vr_headset, kind: box, x: 8.27, y: 2.75, z: 1.73, w: 0.38, d: 0.45, h: 0.16 }
@@ -47,7 +49,8 @@ scene:
     - { object: sdr_b210, kind: tripod, x: 0.22, y: 2.3, w: 0.2, d: 0.2, h: 1.4 }
     - { object: sdr_b310, kind: tripod, x: 0.22, y: 6.2, w: 0.2, d: 0.2, h: 1.4 }
     # --- decoration ----------------------------------------------------------------
-    - { kind: operator-desk, x: 5.82, y: 1.40, w: 0.6, d: 4.3, h: 0.81, count: 5 }
+    # Desk row; the three southern positions are extra seats (the control station takes the northern end).
+    - { kind: operator-desk, x: 5.82, y: 1.40, w: 0.6, d: 4.3, h: 0.81, count: 3 }
     - { kind: cabinets, x: 8.17, y: 1.89, w: 0.59, d: 3.74, h: 1.73, count: 5 }
     - { kind: box, x: 0.2, y: 0.19, w: 0.47, d: 0.52, h: 0.86 }
     - { kind: person, x: 2.9, y: 5.4, w: 0.45, d: 0.3, h: 1.75 }

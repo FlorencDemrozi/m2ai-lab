@@ -5,7 +5,7 @@ expertise:
   - "Resuscitation"
   - "Cardiac MRI"
   - "Sports medicine"
-order: 4
+order: 6
 # PLACEHOLDER: ORCID and expertise to confirm. Role, email and photo from the public UiS profile (Nov 2026).
 placeholder: true
 # The lab confirmed (Nov 2026) that the researchers agreed to their UiS photo being shown.

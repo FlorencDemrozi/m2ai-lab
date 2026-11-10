@@ -9,3 +9,6 @@ test-results/
 .DS_Store
 Thumbs.db
 ~$*.docx
+
+# Researcher survey: personal data, used locally to fill in content. Never commit.
+docs/*survey*.xlsx

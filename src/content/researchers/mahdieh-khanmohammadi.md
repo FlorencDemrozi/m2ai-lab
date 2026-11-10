@@ -4,7 +4,7 @@ expertise:
   - "Brain imaging"
   - "Parkinson's progression modelling"
   - "Stroke outcome prediction"
-order: 3
+order: 4
 # PLACEHOLDER: ORCID and expertise to confirm. Role, email and photo from the public UiS profile (Nov 2026).
 placeholder: true
 # The lab confirmed (Nov 2026) that the researchers agreed to their UiS photo being shown.
