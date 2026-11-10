@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import Wordmark from './Wordmark.astro';
+import Email from './Email.astro';
 import { href, useT, type Locale } from '../i18n/ui';
 import type { Lab } from '../lib/lab';
 interface Props {
@@ -18,7 +19,6 @@ const links = [
   { href: href(locale, 'about'), label: t('nav.about') },
 ];
 const current = Astro.url.pathname;
-const encode = (s: string) => [...s].map((c) => `&#${c.codePointAt(0)};`).join('');
 const other = locale === 'en' ? 'nb' : 'en';
 ---
 <header class="site-header">
@@ -50,7 +50,7 @@ const other = locale === 'en' ? 'nb' : 'en';
       <button class="theme" type="button" data-theme-toggle hidden aria-label={t('theme.toggle')}>
         <Icon name="sun" class="i-sun" /><Icon name="moon" class="i-moon" />
       </button>
-      <Fragment set:html={`<a class="btn btn-primary cta" href="${encode('mailto:' + lab.settings.lab_email)}">${t('nav.collaborate')}</a>`} />
+      <Email address={lab.settings.lab_email} label={t('nav.collaborate')} icon={false} class="btn btn-primary cta" />
     </div>
   </div>
 </header>
@@ -96,7 +96,7 @@ const other = locale === 'en' ? 'nb' : 'en';
   .bar { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; position: relative; }
   .logo {
     display: inline-flex; align-items: center; gap: var(--space-2);
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     color: var(--ink); text-decoration: none; min-height: 44px;
   }
   .mark { height: 40px; width: auto; }

@@ -12,6 +12,8 @@ export default defineConfig({
   base,
   trailingSlash: 'always',
   build: { format: 'directory' },
+  // Scoped styles via a class instead of a data attribute on every element (smaller HTML).
+  scopedStyleStrategy: 'class',
   integrations: [
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', no: 'nb' } },

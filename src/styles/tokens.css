@@ -54,23 +54,25 @@
   --font-body: 'Inter Variable', 'Segoe UI', system-ui, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
-  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
-  --step-2: clamp(1.45rem, 1.25rem + 1vw, 2rem);
-  --step-3: clamp(1.8rem, 1.4rem + 2vw, 3rem);
-  --step-4: clamp(2.4rem, 1.6rem + 4vw, 5rem);
-  --step-5: clamp(3rem, 1.8rem + 6.5vw, 7.5rem);
+  /* Type scale. Desktop body ≈ 15.5 px, small ≈ 13 px; headings step down ~3–4 pt from v1. */
+  --text-xs: 0.7rem; /* mono labels, chips */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.82rem);
+  --step-0: clamp(0.9rem, 0.88rem + 0.12vw, 0.97rem);
+  --step-1: clamp(1.05rem, 1rem + 0.3vw, 1.2rem);
+  --step-2: clamp(1.25rem, 1.1rem + 0.7vw, 1.6rem);
+  --step-3: clamp(1.5rem, 1.2rem + 1.5vw, 2.35rem);
+  --step-4: clamp(1.9rem, 1.35rem + 2.8vw, 3.5rem);
+  --step-5: clamp(2.3rem, 1.4rem + 4.2vw, 4.4rem);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
-  --space-5: 1.5rem;
-  --space-6: 2rem;
-  --space-7: 3rem;
-  --space-8: 5rem;
-  --space-9: 8rem;
+  --space-5: 1.25rem;
+  --space-6: 1.75rem;
+  --space-7: 2.5rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
 
   --radius-sm: 6px;
   --radius: 12px;

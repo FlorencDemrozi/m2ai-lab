@@ -12,7 +12,6 @@ export const LANG_TAG: Record<Locale, string> = { en: 'en', no: 'nb' };
 
 const en = {
   'site.skip': 'Skip to content',
-  'nav.lab': 'The lab',
   'nav.equipment': 'Equipment',
   'nav.applications': 'Applications',
   'nav.researchers': 'Researchers',
@@ -23,8 +22,6 @@ const en = {
   'lang.switch': 'Norsk',
   'lang.switchLabel': 'Les på norsk',
   'theme.toggle': 'Switch colour theme',
-  'theme.light': 'Light',
-  'theme.dark': 'Dark',
 
   'status.installed': 'Available',
   'status.acquiring': 'Being acquired',
@@ -48,7 +45,6 @@ const en = {
   'sync.none': 'No sync',
   'sync.unknown': 'Sync not specified',
 
-  'device.categories': 'Categories',
   'device.source': 'Availability',
   'device.partner': 'Through',
   'device.url': 'More info',
@@ -75,14 +71,9 @@ const en = {
   'catalogue.showing': 'Showing {n} of {total} items',
   'catalogue.empty': 'Nothing matches these filters.',
   'catalogue.reset': 'Clear filters',
-  'catalogue.accessories': 'Accessories and infrastructure',
   'catalogue.planned': 'Planned additions',
   'catalogue.plannedIntro': 'On the wish list, not yet in the lab.',
   'catalogue.jump': 'Jump to a category',
-  'catalogue.name': 'Device',
-  'catalogue.category': 'Category',
-  'catalogue.status': 'Status',
-  'catalogue.contact': 'Contact',
 
   'researchers.title': 'Researchers',
   'researchers.description': 'The people behind the lab: their expertise and how to reach them.',
@@ -91,7 +82,6 @@ const en = {
   'researcher.expertise': 'Expertise',
   'researcher.profile': 'UiS profile',
   'researcher.orcid': 'ORCID',
-  'researcher.email': 'Email',
   'researcher.emailTo': 'Email {name}',
   'researcher.none': 'No equipment listed yet.',
 
@@ -114,8 +104,6 @@ const en = {
   'home.monitor': 'Illustration of synchronized signal streams: {lanes}. All share one clock.',
   'home.live': 'Synchronized',
   'home.pipeline': 'From signals to multimodal AI',
-  'home.seeAll': 'See all {n}',
-  'home.allApplications': 'All applications',
   'home.allResearchers': 'All researchers',
 
   'twin.labels': 'Show all devices',
@@ -126,6 +114,11 @@ const en = {
   'twin.hint': 'Select a device for details. Keyboard: Tab between devices, Enter to open, Esc to close.',
   'twin.placeholder': 'The room layout is illustrative until the lab has been measured.',
   'twin.list': 'Every device in the lab view',
+  'twin.view3d': '3D view',
+  'twin.view2d': '2D map',
+  'twin.app': 'Highlight',
+  'twin.appAll': 'All applications',
+  'twin.hint3d': 'Drag to rotate, scroll to zoom (on touch screens: two fingers). Tab moves between devices, Enter opens details, Esc closes them.',
 
   'footer.contact': 'Contact',
   'footer.visit': 'Visit',
@@ -141,7 +134,6 @@ export type UiKey = keyof typeof en;
 
 const no: Partial<Record<UiKey, string>> = {
   'site.skip': 'Hopp til innhold',
-  'nav.lab': 'Laben',
   'nav.equipment': 'Utstyr',
   'nav.applications': 'Bruksområder',
   'nav.researchers': 'Forskere',
@@ -152,8 +144,6 @@ const no: Partial<Record<UiKey, string>> = {
   'lang.switch': 'English',
   'lang.switchLabel': 'Read in English',
   'theme.toggle': 'Bytt fargetema',
-  'theme.light': 'Lyst',
-  'theme.dark': 'Mørkt',
 
   'status.installed': 'Tilgjengelig',
   'status.acquiring': 'Under anskaffelse',
@@ -177,7 +167,6 @@ const no: Partial<Record<UiKey, string>> = {
   'sync.none': 'Ingen synkronisering',
   'sync.unknown': 'Synkronisering ikke oppgitt',
 
-  'device.categories': 'Kategorier',
   'device.source': 'Tilgang',
   'device.partner': 'Gjennom',
   'device.url': 'Mer info',
@@ -204,14 +193,9 @@ const no: Partial<Record<UiKey, string>> = {
   'catalogue.showing': 'Viser {n} av {total}',
   'catalogue.empty': 'Ingenting passer med disse filtrene.',
   'catalogue.reset': 'Nullstill filtre',
-  'catalogue.accessories': 'Tilbehør og infrastruktur',
   'catalogue.planned': 'Planlagte anskaffelser',
   'catalogue.plannedIntro': 'På ønskelisten, ikke i laben ennå.',
   'catalogue.jump': 'Gå til kategori',
-  'catalogue.name': 'Utstyr',
-  'catalogue.category': 'Kategori',
-  'catalogue.status': 'Status',
-  'catalogue.contact': 'Kontakt',
 
   'researchers.title': 'Forskere',
   'researchers.description': 'Menneskene bak laben: fagfelt og kontaktinformasjon.',
@@ -220,7 +204,6 @@ const no: Partial<Record<UiKey, string>> = {
   'researcher.expertise': 'Fagfelt',
   'researcher.profile': 'Profil på uis.no',
   'researcher.orcid': 'ORCID',
-  'researcher.email': 'E-post',
   'researcher.emailTo': 'Send e-post til {name}',
   'researcher.none': 'Ingen utstyr registrert ennå.',
 
@@ -243,8 +226,6 @@ const no: Partial<Record<UiKey, string>> = {
   'home.monitor': 'Illustrasjon av synkroniserte signalstrømmer: {lanes}. Alle deler én klokke.',
   'home.live': 'Synkronisert',
   'home.pipeline': 'Fra signaler til multimodal KI',
-  'home.seeAll': 'Se alle {n}',
-  'home.allApplications': 'Alle bruksområder',
   'home.allResearchers': 'Alle forskere',
 
   'twin.labels': 'Vis alle navn',
@@ -255,6 +236,11 @@ const no: Partial<Record<UiKey, string>> = {
   'twin.hint': 'Velg utstyr for detaljer. Tastatur: Tab mellom utstyr, Enter for å åpne, Esc for å lukke.',
   'twin.placeholder': 'Romoppsettet er illustrativt til laben er målt opp.',
   'twin.list': 'Alt utstyr i labvisningen',
+  'twin.view3d': '3D-visning',
+  'twin.view2d': '2D-kart',
+  'twin.app': 'Fremhev',
+  'twin.appAll': 'Alle bruksområder',
+  'twin.hint3d': 'Dra for å rotere, rull for å zoome (på berøringsskjerm: to fingre). Tab flytter mellom utstyr, Enter åpner detaljer, Esc lukker.',
 
   'footer.contact': 'Kontakt',
   'footer.visit': 'Besøk',

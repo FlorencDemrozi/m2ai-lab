@@ -172,8 +172,22 @@ a.tag:hover { border-color: var(--accent); color: var(--ink); }
 .grid {
   display: grid;
   gap: var(--space-5);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
 }
+
+/*
+ * Topic grid (categories, applications): equal columns, 5 per row on desktop,
+ * 3 on tablet, 2 on phones (1 on very narrow screens). Long labels wrap inside cards.
+ */
+.grid-5 {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+}
+.grid-5 > * { min-width: 0; }
+@media (min-width: 22rem) { .grid-5 { --cols: 2; } }
+@media (min-width: 42rem) { .grid-5 { --cols: 3; } }
+@media (min-width: 62rem) { .grid-5 { --cols: 5; } }
 
 .panel {
   background: var(--bg-raised);

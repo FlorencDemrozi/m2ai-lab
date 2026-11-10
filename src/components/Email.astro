@@ -10,9 +10,11 @@ interface Props {
   label?: string;
   /** Show only the envelope icon (label becomes the accessible name). */
   iconOnly?: boolean;
+  /** false: text only (e.g. a button). */
+  icon?: boolean;
   class?: string;
 }
-const { address, label, iconOnly = false, class: cls } = Astro.props;
+const { address, label, iconOnly = false, icon = true, class: cls } = Astro.props;
 const encode = (s: string) => [...s].map((c) => `&#${c.codePointAt(0)};`).join('');
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.codePointAt(0)};`);
 const href = encode(`mailto:${address}`);
@@ -23,7 +25,7 @@ const text = label ? escapeHtml(label) : encode(address);
 ) : (
   <Fragment set:html={`<a class="email ${cls ?? ''}" href="${href}">`} />
 )}
-<Icon name="mail" size={18} />
+{(icon || iconOnly) && <Icon name="mail" size={18} />}
 {!iconOnly && <Fragment set:html={`<span>${text}</span>`} />}
 <Fragment set:html="</a>" />
 <style is:global>
