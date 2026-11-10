@@ -21,13 +21,15 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
       OptiTrack (up to 360 Hz), Delsys (≈ 2 kHz), Neon (200 Hz) and the B310 (≤ 7.2 GHz) are shown. Confirm or add.
 - [ ] Replaced by real inventory items and deleted: wireless EMG, smartwatches, eye-tracking glasses, thermal/optical
       cameras, GPU workstation, edge-AI nodes, mobile EEG, ECG wearables.
-- [ ] **12 wish-list devices remain `planned` + `placeholder: true`** (force platforms, smart insoles, Xsens,
-      open-source EEG, screen eye tracker, microphone array, wearable microphones, UWB, ISAC testbed,
+- [ ] **11 wish-list devices remain `planned` + `placeholder: true`** (force platforms, smart insoles, Xsens,
+      open-source EEG, screen eye tracker, microphone array, UWB, ISAC testbed,
       low-field MRI, POCUS, research storage). Keep, confirm or delete each; researchers and applications are guesses.
 - [ ] Device photos (our own; no manufacturer images). Until then cards use icons.
 - [x] New items (Nov 2026), all available: multispectral LED illuminator, 20 × WitMotion WT901WIFI (WiFi model),
       100 × BLE coin-size sensors (built in-house), Samsung 98-inch display on the west wall.
 - [ ] Still missing for them: illuminator model and wavelengths, which sensors the BLE coins carry, display model.
+- [x] Wearable microphones placeholder replaced by the real item: 5 × RØDE Wireless PRO / Wireless GO sets.
+- [ ] Still missing for it: the PRO vs GO split of the 5 sets.
 - [x] Markerless depth cameras removed as a planned item: the PrimeX 22 cameras are dual mode (IR + depth), now in
       the OptiTrack entry.
 - [x] Control station: lab workstation with two 28-inch monitors (in its specs and in the twin).
