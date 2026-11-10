@@ -8,7 +8,6 @@ researchers: [florenc-demrozi]
 applications: [gait, har, parkinsons, rehabilitation, balance, upper-body, sports]
 manufacturer: "Movella (Xsens)"
 model: "Awinda"
-twin_object: xsens_awinda
 order: 20
 placeholder: true
 ---

@@ -18,6 +18,9 @@ Missing real content is tracked in `TODO-content.md`.
   - `src/lib/lab.ts` — `loadLab()`: loads all collections once, checks cross-file ids, computes reverse links. Pages get data from here, not from `getCollection` directly.
   - `src/pages/[...locale]/` — every route once per locale (`locale` param undefined = English at `/`, `no` = `/no/`). Build links with `href(locale, ...segments)` from `src/i18n/ui.ts` (handles base path + trailing slash).
   - `DeviceCard.astro` is THE device card — reuse it in the twin layers.
+  - `src/twin/` — `Twin2D.astro` (2D layer: isometric SVG + hotspots + card popover + text list) and `iso.ts`
+    (build-time geometry). Scene data: `src/content/twin.yaml`, keyed by `twin_object`. A Blender render later
+    replaces only the drawn room/shapes; hotspots, cards and list stay.
 
 ## Commands
 

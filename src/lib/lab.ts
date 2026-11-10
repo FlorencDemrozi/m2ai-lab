@@ -38,7 +38,7 @@ function group<K extends string, V>(pairs: Array<[K, V]>): Map<K, V[]> {
 }
 
 async function build() {
-  const [devices, researchers, applications, categories, projects, publications, zones, settingsAll, homeAll] =
+  const [devices, researchers, applications, categories, projects, publications, zones, settingsAll, homeAll, twinAll] =
     await Promise.all([
       getCollection('devices'),
       getCollection('researchers'),
@@ -49,6 +49,7 @@ async function build() {
       getCollection('zones'),
       getCollection('settings'),
       getCollection('home'),
+      getCollection('twin'),
     ]);
 
   devices.sort(byOrder);
@@ -113,6 +114,13 @@ async function build() {
     else if (twinSeen.has(obj)) console.warn(`[m2ai] twin_object "${obj}" is used by both ${twinSeen.get(obj)} and ${d.id}.`);
     else twinSeen.set(obj, d.id);
   }
+  const scene = twinAll.find((t) => t.id === 'scene')?.data;
+  const inScene = new Set(scene?.objects.flatMap((o) => (o.object ? [o.object] : [])) ?? []);
+  for (const obj of inScene) {
+    if (!twinSeen.has(obj)) console.warn(`[m2ai] twin.yaml has a shape "${obj}" that no device uses as twin_object; it is drawn as decoration.`);
+  }
+  const noShape = [...twinSeen].filter(([obj]) => !inScene.has(obj)).map(([, id]) => id);
+  if (noShape.length) console.warn(`[m2ai] twin_object set but no shape in src/content/twin.yaml yet: ${noShape.join(', ')}`);
   if (notInTwin.length) console.warn(`[m2ai] Not shown in the digital twin (no twin_object): ${notInTwin.join(', ')}`);
   const ph = [...devices, ...researchers, ...applications].filter((e) => e.data.placeholder).length;
   if (ph) console.warn(`[m2ai] ${ph} content files are marked placeholder: true (see TODO-content.md).`);
@@ -151,6 +159,9 @@ async function build() {
     categories,
     featuredCategories: categories.filter((c) => c.data.featured),
     home: home!.data,
+    twin: scene,
+    /** Device drawn as a scene shape, by twin_object. */
+    deviceByTwin: (obj: string | undefined) => (obj ? index.devices.get(twinSeen.get(obj) ?? '') : undefined),
     projects,
     publications,
     zones,

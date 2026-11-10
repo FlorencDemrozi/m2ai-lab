@@ -105,6 +105,8 @@ const home = defineCollection({
     highlights: z
       .array(z.object({ device: reference('devices'), label: localized }))
       .default([]),
+    twin_heading: localized,
+    twin_intro: localized,
     unique_eyebrow: localized,
     unique_heading: localized,
     unique_body: localized,
@@ -199,6 +201,36 @@ const zones = defineCollection({
   }),
 });
 
+/**
+ * The 2D digital-twin scene: room size and one shape per `twin_object`, in metres
+ * (origin = the room's back-left floor corner; x to the right, y towards the viewer, z up).
+ * Shapes are drawn as isometric boxes until the Blender render replaces the drawing;
+ * hotspots keep working either way. Objects without `object` are decoration.
+ */
+const TWIN_KINDS = ['box', 'desk', 'workstation', 'tripod', 'rack', 'cart', 'plate', 'camera-array', 'anchors', 'person', 'scanner'] as const;
+const twin = defineCollection({
+  loader: file('./src/content/twin.yaml'),
+  schema: z.object({
+    room: z.object({ width: z.number().positive(), depth: z.number().positive(), height: z.number().positive() }),
+    objects: z.array(
+      z.object({
+        /** Matches a device's `twin_object`. Omit for decoration (furniture, a participant). */
+        object: z.string().optional(),
+        kind: z.enum(TWIN_KINDS),
+        x: z.number(),
+        y: z.number(),
+        z: z.number().default(0),
+        w: z.number().positive(),
+        d: z.number().positive(),
+        h: z.number().positive(),
+        /** camera-array / anchors: how many units around the rectangle. */
+        count: z.number().int().positive().optional(),
+      }),
+    ),
+    placeholder,
+  }),
+});
+
 const settings = defineCollection({
   loader: file('./src/content/settings.yaml'),
   schema: z.object({
@@ -238,6 +270,7 @@ export const collections = {
   projects,
   publications,
   zones,
+  twin,
   settings,
   pages,
 };

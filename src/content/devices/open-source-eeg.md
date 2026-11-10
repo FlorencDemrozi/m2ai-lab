@@ -6,7 +6,6 @@ status: planned
 categories: [eeg]
 researchers: [morteza-esmaeili]
 applications: [digital-biomarkers]
-twin_object: open_source_eeg
 order: 70
 placeholder: true
 ---

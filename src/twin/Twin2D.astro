@@ -1,0 +1,381 @@
+---
+/**
+ * 2D digital twin (REQUIREMENTS §3.2, §5 layer 1). An isometric SVG drawn at build time
+ * from src/content/twin.yaml, with one hotspot per device (`twin_object`).
+ *
+ * - No JS: hotspots are plain links to the device pages; toggles are CSS-only checkboxes;
+ *   the text list below the scene carries the same information.
+ * - With JS: click / tap / Enter opens a floating DeviceCard, Esc closes it and returns focus.
+ * - Tab order follows the devices (available first, then planned), not the drawing order.
+ * When the Blender render arrives, it replaces the <g class="room"> + <g class="shapes">
+ * drawing; the hotspot layer, cards and list stay as they are.
+ */
+import DeviceCard from '../components/DeviceCard.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import SourceBadge from '../components/SourceBadge.astro';
+import Email from '../components/Email.astro';
+import Icon from '../components/Icon.astro';
+import type { Device, Lab } from '../lib/lab';
+import { href, pick, useT, type Locale } from '../i18n/ui';
+import { anchor, boxFaces, depth, floorRect, parts, project, pts, silhouette, type Box } from './iso';
+
+interface Props {
+  lab: Lab;
+  locale: Locale;
+  heading: string;
+  intro: string;
+}
+const { lab, locale, heading, intro } = Astro.props;
+const t = useT(locale);
+const scene = lab.twin;
+if (!scene) throw new Error('src/content/twin.yaml must contain one entry with the id "scene".');
+const { width: W, depth: D, height: H } = scene.room;
+
+type Item = { device?: Device; boxes: Box[]; groups: Box[][]; kind: string };
+// Retired devices are hidden from lab views, so their shapes are dropped entirely.
+const items: Item[] = scene.objects
+  .map((o) => ({ device: lab.deviceByTwin(o.object), kind: o.kind, ...parts(o) }))
+  .filter((i) => i.device?.data.status !== 'retired');
+
+const statusOf = (i: Item) => (i.device ? (i.device.data.status === 'installed' ? 'installed' : 'planned') : 'decor');
+
+// Painter's order over every box of every object.
+const drawn = items
+  .flatMap((i) => i.boxes.map((b) => ({ b, status: statusOf(i), id: i.device?.id })))
+  .sort((p, q) => depth(p.b) - depth(q.b));
+
+// Hotspots in logical order: available first, then planned; each by device order.
+const hot = items
+  .filter((i) => i.device)
+  .sort((a, b) => {
+    const sa = a.device!.data.status === 'installed' ? 0 : 1;
+    const sb = b.device!.data.status === 'installed' ? 0 : 1;
+    return sa - sb || a.device!.data.order - b.device!.data.order;
+  });
+const listed = hot.map((i) => i.device!);
+
+// View box: room floor + walls.
+const corners = [project(0, 0, H), project(W, 0, H), project(0, D, 0), project(W, D, 0), project(0, 0, 0), project(W, 0, 0), project(0, D, H)];
+const pad = 30;
+const minX = Math.min(...corners.map((c) => c[0])) - pad;
+const maxX = Math.max(...corners.map((c) => c[0])) + pad;
+const minY = Math.min(...corners.map((c) => c[1])) - pad;
+const maxY = Math.max(...corners.map((c) => c[1])) + pad;
+const vb = `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}`;
+
+const grid: string[] = [];
+for (let gx = 1; gx < W; gx++) grid.push(pts([project(gx, 0, 0), project(gx, D, 0)]));
+for (let gy = 1; gy < D; gy++) grid.push(pts([project(0, gy, 0), project(W, gy, 0)]));
+const wallBack = pts([project(0, 0, 0), project(W, 0, 0), project(W, 0, H), project(0, 0, H)]);
+const wallLeft = pts([project(0, 0, 0), project(0, D, 0), project(0, D, H), project(0, 0, H)]);
+
+const name = (d: Device) => pick(d.data.name, locale);
+const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`;
+---
+<section class="explore" id="explore" aria-labelledby="explore-h">
+  <div class="wrap">
+    <div class="head">
+      <h2 id="explore-h">{heading}</h2>
+      <p class="lede">{intro}</p>
+    </div>
+
+    <div class="twin scope-dark" data-twin-root>
+      <div class="controls">
+        <label class="toggle"><input type="checkbox" id="twin-labels" /> <span>{t('twin.labels')}</span></label>
+        <label class="toggle"><input type="checkbox" id="twin-planned" checked /> <span>{t('twin.planned')}</span></label>
+        <label class="toggle"><input type="checkbox" id="twin-volume" checked /> <span>{t('twin.volume')}</span></label>
+      </div>
+
+      <div class="stage" data-stage>
+        <div class="scroller">
+        <svg viewBox={vb} role="group" aria-label={t('twin.map')}>
+          <g class="room" aria-hidden="true">
+            <polygon class="wall" points={wallBack} />
+            <polygon class="wall" points={wallLeft} />
+            <polygon class="floor" points={floorRect(0, 0, W, D)} />
+            {grid.map((g) => <polyline class="grid" points={g} />)}
+          </g>
+          <g class="zones" aria-hidden="true">
+            {lab.zones.map((z) => <polygon class="zone" points={floorRect(z.data.rect.x, z.data.rect.y, z.data.rect.width, z.data.rect.depth)} />)}
+          </g>
+          <g class="shapes" aria-hidden="true">
+            {drawn.map(({ b, status, id }) => {
+              const f = boxFaces(b);
+              return (
+                <g class={`box s-${status}`} data-shape={id}>
+                  <polygon class="f-side" points={f.side} />
+                  <polygon class="f-front" points={f.front} />
+                  <polygon class="f-top" points={f.top} />
+                </g>
+              );
+            })}
+          </g>
+          <g class="labels" aria-hidden="true">
+            {hot.map((i) => {
+              const [lx, ly] = anchor(i.groups.length > 1 ? i.groups[0] : i.boxes);
+              const text = name(i.device!);
+              const w = text.length * 6.4 + 14;
+              return (
+                <g class={`label s-${statusOf(i)}`} transform={`translate(${lx.toFixed(1)} ${(ly - 12).toFixed(1)})`}>
+                  <rect x={-w / 2} y="-11" width={w} height="20" rx="10" />
+                  <text text-anchor="middle" y="3">{text}</text>
+                </g>
+              );
+            })}
+          </g>
+          <g class="hotspots">
+            {hot.map((i) => (
+              <a
+                class={`hot s-${statusOf(i)}`}
+                href={href(locale, 'devices', i.device!.id)}
+                aria-label={accessible(i.device!)}
+                data-device={i.device!.id}
+              >
+                {i.groups.map((g) => (
+                  <>
+                    <polygon class="hit" points={silhouette(g, 6)} />
+                    <polygon class="outline" points={silhouette(g, 4)} />
+                  </>
+                ))}
+              </a>
+            ))}
+          </g>
+        </svg>
+        </div>
+
+        <div class="pop" data-pop hidden role="dialog" aria-modal="false" tabindex="-1">
+          <button type="button" class="close" data-close aria-label={t('twin.close')}><Icon name="close" size={18} /></button>
+          <div data-slot></div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <p class="legend">
+          <span class="key key-installed" aria-hidden="true"></span> {t('status.installed')}
+          <span class="key key-planned" aria-hidden="true"></span> {t('status.planned')}
+          <span class="key key-zone" aria-hidden="true"></span> {pick(lab.zones[0]?.data.name, locale)}
+        </p>
+        <p class="hint">{t('twin.hint')}</p>
+        {scene.placeholder && <p class="hint">{t('twin.placeholder')}</p>}
+      </div>
+    </div>
+
+    <div class="cards" data-cards hidden>
+      {listed.map((d) => <div data-card={d.id}><DeviceCard device={d} lab={lab} locale={locale} level={3} /></div>)}
+    </div>
+
+    <h3 class="list-h" id="twin-list-h">{t('twin.list')}</h3>
+    <ul class="list" role="list" aria-labelledby="twin-list-h">
+      {listed.map((d) => (
+        <li data-status={d.data.status}>
+          <div class="row-main">
+            <a class="row-name" href={href(locale, 'devices', d.id)}>{name(d)}</a>
+            <span class="row-badges">
+              <StatusBadge status={d.data.status} expected={d.data.expected} placeholder={d.data.placeholder} locale={locale} />
+              <SourceBadge source={d.data.source} locale={locale} />
+            </span>
+          </div>
+          <p class="row-sum">{pick(d.data.summary, locale)}</p>
+          <p class="row-meta">
+            {lab.device.applications(d).map((a, k) => <>{k > 0 && ', '}<a href={href(locale, 'applications', a.id)}>{pick(a.data.name, locale)}</a></>)}
+            {lab.device.applications(d).length > 0 && <span aria-hidden="true"> · </span>}
+            {lab.device.researchers(d).map((r, k) => (
+              <>{k > 0 && ', '}<a href={href(locale, 'researchers', r.id)}>{r.data.name}</a>{r.data.email && <> <Email address={r.data.email} label={t('researcher.emailTo', { name: r.data.name })} iconOnly /></>}</>
+            ))}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-twin-root]')) {
+    const section = root.closest('section')!;
+    const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+    const pop = root.querySelector<HTMLElement>('[data-pop]')!;
+    const slot = pop.querySelector<HTMLElement>('[data-slot]')!;
+    const cards = section.querySelector<HTMLElement>('[data-cards]')!;
+    let active: SVGAElement | null = null;
+
+    const close = (restore = true) => {
+      if (!active) return;
+      pop.hidden = true;
+      slot.replaceChildren();
+      active.classList.remove('is-active');
+      if (restore) active.focus();
+      active = null;
+    };
+
+    const place = (a: SVGAElement) => {
+      const s = stage.getBoundingClientRect();
+      const r = a.getBoundingClientRect();
+      if (s.width < 640) {
+        pop.classList.add('docked');
+        pop.style.left = pop.style.top = '';
+        return;
+      }
+      pop.classList.remove('docked');
+      const pw = pop.offsetWidth;
+      const ph = pop.offsetHeight;
+      let left = r.right - s.left + 16;
+      if (left + pw > s.width - 8) left = r.left - s.left - pw - 16;
+      left = Math.max(8, Math.min(left, s.width - pw - 8));
+      let top = r.top - s.top + r.height / 2 - ph / 2;
+      top = Math.max(8, Math.min(top, s.height - ph - 8));
+      pop.style.left = `${left}px`;
+      pop.style.top = `${top}px`;
+    };
+
+    const open = (a: SVGAElement) => {
+      const id = a.dataset.device;
+      const card = cards.querySelector(`[data-card="${id}"]`);
+      if (!card) return;
+      if (active && active !== a) close(false);
+      active = a;
+      a.classList.add('is-active');
+      slot.replaceChildren(card.firstElementChild!.cloneNode(true));
+      pop.setAttribute('aria-label', a.getAttribute('aria-label') ?? '');
+      pop.hidden = false;
+      place(a);
+      pop.focus({ preventScroll: true });
+      if (pop.classList.contains('docked')) pop.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    };
+
+    for (const a of root.querySelectorAll<SVGAElement>('a.hot')) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (active === a) close();
+        else open(a);
+      });
+    }
+    pop.querySelector('[data-close]')!.addEventListener('click', () => close());
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && active) {
+        e.preventDefault();
+        close();
+      }
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (active && !pop.contains(e.target as Node) && !(e.target as Element).closest?.('a.hot')) close(false);
+    });
+    // Hiding planned devices while one of them is open closes its card.
+    root.querySelector('#twin-planned')?.addEventListener('change', () => {
+      if (active?.classList.contains('s-planned')) close(false);
+    });
+    addEventListener('resize', () => active && place(active));
+    // Narrow screens: the map is wider than the viewport, so start it centred.
+    const scroller = root.querySelector<HTMLElement>('.scroller');
+    if (scroller && scroller.scrollWidth > scroller.clientWidth) scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
+  }
+</script>
+
+<style>
+  .explore { padding-block: var(--space-8) var(--space-6); }
+  .head { max-width: 52rem; margin-bottom: var(--space-6); }
+
+  .twin {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background:
+      radial-gradient(70% 60% at 50% 40%, color-mix(in srgb, var(--glow) 10%, transparent), transparent 70%),
+      var(--bg);
+  }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5);
+    padding: var(--space-3) var(--space-5); border-bottom: 1px solid var(--line);
+    font-size: var(--step--1);
+  }
+  .toggle { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; cursor: pointer; }
+  .toggle input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+
+  .stage { position: relative; }
+  .room, .zones, .shapes, .labels { pointer-events: none; }
+  .scroller { overflow-x: auto; overscroll-behavior-x: contain; }
+  svg { display: block; width: 100%; min-width: 680px; height: auto; max-height: 80vh; margin-inline: auto; }
+
+  .wall { fill: color-mix(in srgb, var(--bg-raised) 70%, transparent); stroke: var(--line); stroke-width: 1; }
+  .floor { fill: color-mix(in srgb, var(--bg-raised) 85%, var(--bg)); stroke: var(--line-strong); stroke-width: 1; }
+  .grid { fill: none; stroke: var(--grid-line); stroke-width: 1; }
+  .zone {
+    fill: color-mix(in srgb, var(--glow) 12%, transparent);
+    stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 6 4;
+  }
+
+  .box polygon { stroke-width: 0.8; stroke-linejoin: round; }
+  .box.s-decor .f-top { fill: color-mix(in srgb, var(--ink-soft) 30%, var(--bg-raised)); }
+  .box.s-decor .f-front { fill: color-mix(in srgb, var(--ink-soft) 18%, var(--bg-raised)); }
+  .box.s-decor .f-side { fill: color-mix(in srgb, var(--ink-soft) 10%, var(--bg-raised)); }
+  .box.s-decor polygon { stroke: var(--line); }
+  .box.s-installed .f-top { fill: color-mix(in srgb, var(--accent) 60%, var(--bg-raised)); }
+  .box.s-installed .f-front { fill: color-mix(in srgb, var(--accent) 34%, var(--bg-raised)); }
+  .box.s-installed .f-side { fill: color-mix(in srgb, var(--accent) 20%, var(--bg-raised)); }
+  .box.s-installed polygon { stroke: color-mix(in srgb, var(--accent) 70%, var(--bg)); }
+  .box.s-planned polygon {
+    fill: color-mix(in srgb, var(--status-planned) 8%, transparent);
+    stroke: var(--status-planned); stroke-dasharray: 3 3; stroke-width: 1;
+  }
+
+  .labels { display: none; }
+  .label rect { fill: var(--bg-raised); stroke: var(--line-strong); stroke-width: 1; }
+  .label text { fill: var(--ink); font: 600 11px var(--font-body); }
+  .label.s-planned rect { stroke-dasharray: 3 2; }
+
+  .hot { cursor: pointer; outline: none; }
+  .hit { fill: transparent; stroke: transparent; stroke-width: 14; pointer-events: all; }
+  .outline {
+    fill: color-mix(in srgb, var(--glow) 10%, transparent); stroke: var(--glow); stroke-width: 2.5;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s var(--ease);
+    filter: drop-shadow(0 0 6px var(--glow));
+  }
+  .hot:hover .outline, .hot.is-active .outline { opacity: 1; }
+  .hot:focus-visible .outline { opacity: 1; stroke: var(--focus); stroke-width: 3; filter: drop-shadow(0 0 6px var(--focus)); }
+
+  /* CSS-only toggles (work without JS). */
+  .twin:has(#twin-labels:checked) .labels { display: inline; }
+  .twin:not(:has(#twin-planned:checked)) .s-planned { display: none; }
+  .twin:not(:has(#twin-volume:checked)) .zones { display: none; }
+
+  .pop {
+    position: absolute; z-index: 5; width: min(22rem, calc(100% - 16px));
+    max-height: calc(100% - 16px); overflow: auto;
+    border-radius: var(--radius); box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.7), 0 0 0 1px var(--line);
+  }
+  .pop[hidden] { display: none; }
+  .pop:focus { outline: none; }
+  .pop:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .pop.docked { position: relative; inset: auto; width: auto; max-height: none; margin: 0 var(--space-3) var(--space-3); }
+  .close {
+    position: absolute; top: var(--space-2); right: var(--space-2); z-index: 2;
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px;
+    background: var(--bg-sunken); color: var(--ink); border: 1px solid var(--line); cursor: pointer;
+  }
+  .pop :global(.device-card) { padding-right: calc(var(--space-5) + 36px); }
+  @media (hover: hover) { .pop :global(.device-card:hover) { transform: none; } }
+
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2) var(--space-5); padding: var(--space-3) var(--space-5); border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--ink-soft); }
+  .foot p { margin: 0; }
+  .legend { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+  .key { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-left: var(--space-2); }
+  .key:first-child { margin-left: 0; }
+  .key-installed { background: color-mix(in srgb, var(--accent) 60%, var(--bg-raised)); }
+  .key-planned { border: 1.5px dashed var(--status-planned); }
+  .key-zone { background: color-mix(in srgb, var(--glow) 18%, transparent); border: 1.5px dashed var(--accent); }
+
+  .list-h { margin-top: var(--space-7); font-size: var(--step-1); }
+  .list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .list li { padding: var(--space-3) 0; border-bottom: 1px solid var(--line); display: grid; gap: var(--space-1); }
+  .row-main { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  .row-name { font-weight: 600; }
+  .row-badges { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+  .row-sum, .row-meta { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
+  .row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; }
+  .row-meta :global(a) { color: var(--ink); }
+  @media (min-width: 60rem) {
+    .list li { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); column-gap: var(--space-5); }
+    .row-main { grid-row: span 2; align-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) { .outline { transition: none; } }
+</style>

@@ -48,6 +48,8 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 ## Images and 3D
 
 - [ ] Hero render and 2D isometric twin image (both from the same Blender model and camera).
+- [ ] **2D twin layout** (`src/content/twin.yaml`): room size (10 × 11 × 3.2 m), every device position and the
+      capture-volume position are guesses. Needs the floor plan; until then the twin says "illustrative".
 - [ ] Floor plan, ceiling height, camera positions or a scan of room KE E-470. The OptiTrack zone's position in the room (`src/content/zones/capture-volume.yaml`) is a placeholder.
 - [ ] Device photos.
 - [ ] UiS logo files and visual-profile rules. The colours and fonts in `src/styles/tokens.css` are provisional.

@@ -1,0 +1,29 @@
+# 2D digital-twin scene. Exactly one entry, with the id "scene".
+# PLACEHOLDER: room size and every position are guesses until the floor plan / scan of
+# KE E-470 arrives (TODO-content.md). Units: metres. Origin: back-left floor corner,
+# x to the right, y towards the viewer, z up. The capture volume comes from src/content/zones/.
+scene:
+  placeholder: true
+  room: { width: 10, depth: 11, height: 3.2 }
+  objects:
+    # --- installed ---------------------------------------------------------------
+    - { object: optitrack_cameras, kind: camera-array, x: 1.5, y: 1.5, z: 2.9, w: 5, d: 8, h: 0.18, count: 12 }
+    - { object: wireless_emg, kind: cart, x: 7.0, y: 6.6, w: 0.6, d: 0.5, h: 0.95 }
+    - { object: vr_headset, kind: box, x: 7.0, y: 4.0, w: 0.5, d: 0.5, h: 1.05 }
+    - { object: thermal_camera_wide, kind: tripod, x: 0.5, y: 3.0, w: 0.22, d: 0.22, h: 1.7 }
+    - { object: thermal_camera_narrow, kind: tripod, x: 0.5, y: 7.4, w: 0.22, d: 0.22, h: 1.5 }
+    - { kind: rack, x: 8.6, y: 4.0, w: 0.6, d: 1.6, h: 0.9 }
+    - { object: sdr_b210, kind: box, x: 8.7, y: 4.15, z: 0.9, w: 0.4, d: 0.55, h: 0.12 }
+    - { object: sdr_b310, kind: box, x: 8.7, y: 4.95, z: 0.9, w: 0.4, d: 0.5, h: 0.14 }
+    - { object: gpu_workstation, kind: workstation, x: 7.4, y: 0.35, w: 1.9, d: 0.8, h: 0.75 }
+    - { kind: person, x: 3.8, y: 5.3, w: 0.45, d: 0.3, h: 1.75 }
+    # --- planned (drawn ghosted) ---------------------------------------------------
+    - { object: force_platforms, kind: plate, x: 3.2, y: 4.0, w: 1.2, d: 1.8, h: 0.04 }
+    - { object: markerless_depth_cameras, kind: tripod, x: 6.9, y: 9.6, w: 0.2, d: 0.2, h: 1.6 }
+    - { object: microphone_array, kind: box, x: 3.6, y: 5.2, z: 3.0, w: 0.8, d: 0.8, h: 0.06 }
+    - { object: uwb_rtls, kind: anchors, x: 0.2, y: 0.2, z: 2.6, w: 9.6, d: 10.6, h: 0.12, count: 4 }
+    - { object: research_storage, kind: box, x: 9.4, y: 0.4, w: 0.45, d: 0.6, h: 0.7 }
+    - { object: screen_eye_tracker, kind: box, x: 7.6, y: 1.6, w: 0.9, d: 0.6, h: 0.75 }
+    - { object: isac_testbed, kind: rack, x: 8.6, y: 7.6, w: 0.6, d: 1.2, h: 1.6 }
+    - { object: pocus_ultrasound, kind: cart, x: 0.6, y: 9.6, w: 0.6, d: 0.5, h: 1.1 }
+    - { object: low_field_mri, kind: scanner, x: 0.15, y: 0.3, w: 1.15, d: 2.2, h: 1.5 }

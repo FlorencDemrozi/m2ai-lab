@@ -6,7 +6,6 @@ status: planned
 categories: [audio]
 researchers: [mina-farmanbar]
 applications: [digital-biomarkers, aging-aal, wearable-ai]
-twin_object: wearable_microphones
 order: 140
 placeholder: true
 ---

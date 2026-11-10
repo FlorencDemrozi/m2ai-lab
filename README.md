@@ -143,6 +143,7 @@ researchers: [florenc-demrozi]
 | File | What it holds |
 |---|---|
 | `src/content/categories/<id>.yaml` | Equipment categories (filter tags, home tiles, signal lanes): name, short, subtitle, icon, featured, signal, order |
+| `src/content/twin.yaml` | 2D digital-twin scene: room size and one shape per `twin_object` (kind, position, size in metres) |
 | `src/content/home.yaml` | Home-page copy: hero intro, highlights, pipeline steps, collaborate text |
 | `src/content/zones/<id>.yaml` | Floor areas (e.g. the OptiTrack volume) in metres, with their devices |
 | `src/content/settings.yaml` | Lab name, tagline, shared email, address, social links |

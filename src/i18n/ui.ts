@@ -118,6 +118,15 @@ const en = {
   'home.allApplications': 'All applications',
   'home.allResearchers': 'All researchers',
 
+  'twin.labels': 'Show all devices',
+  'twin.planned': 'Show planned devices',
+  'twin.volume': 'Show capture volume',
+  'twin.map': 'Map of the lab. Each device is a link; with JavaScript, Enter opens its details here and Esc closes them.',
+  'twin.close': 'Close details',
+  'twin.hint': 'Select a device for details. Keyboard: Tab between devices, Enter to open, Esc to close.',
+  'twin.placeholder': 'The room layout is illustrative until the lab has been measured.',
+  'twin.list': 'Every device in the lab view',
+
   'footer.contact': 'Contact',
   'footer.visit': 'Visit',
   'footer.accessibility': 'Accessibility statement',
@@ -237,6 +246,15 @@ const no: Partial<Record<UiKey, string>> = {
   'home.seeAll': 'Se alle {n}',
   'home.allApplications': 'Alle bruksområder',
   'home.allResearchers': 'Alle forskere',
+
+  'twin.labels': 'Vis alle navn',
+  'twin.planned': 'Vis planlagt utstyr',
+  'twin.volume': 'Vis opptaksområdet',
+  'twin.map': 'Kart over laben. Hvert utstyr er en lenke; med JavaScript åpner Enter detaljene her og Esc lukker dem.',
+  'twin.close': 'Lukk detaljer',
+  'twin.hint': 'Velg utstyr for detaljer. Tastatur: Tab mellom utstyr, Enter for å åpne, Esc for å lukke.',
+  'twin.placeholder': 'Romoppsettet er illustrativt til laben er målt opp.',
+  'twin.list': 'Alt utstyr i labvisningen',
 
   'footer.contact': 'Kontakt',
   'footer.visit': 'Besøk',

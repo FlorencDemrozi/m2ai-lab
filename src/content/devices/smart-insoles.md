@@ -6,7 +6,6 @@ status: planned
 categories: [motion-capture]
 researchers: [florenc-demrozi]
 applications: [gait, parkinsons, balance, fall-detection, digital-biomarkers, wearable-ai]
-twin_object: smart_insoles
 order: 40
 placeholder: true
 ---

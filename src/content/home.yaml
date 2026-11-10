@@ -11,6 +11,9 @@ home:
       label: { en: "wireless EMG + IMU sensors", no: "trådløse EMG- og IMU-sensorer" }
     - device: smartwatches
       label: { en: "smartwatches for everyday sensing", no: "smartklokker for hverdagsmåling" }
+  twin_heading: { en: "Explore the Lab", no: "Utforsk laben" }
+  twin_intro:
+    en: "Room KE E-470 as a map. Select a device to see what it is, whether it is available, and who to contact. The dashed floor area is the OptiTrack capture volume."
   unique_eyebrow: { en: "What makes the lab different", no: "Det som skiller laben" }
   unique_heading: { en: "Every modality, recorded at once, against one ground truth.", no: "Alle modaliteter, tatt opp samtidig, mot én fasit." }
   unique_body:

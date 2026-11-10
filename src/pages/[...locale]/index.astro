@@ -10,6 +10,7 @@ import Wordmark from '../../components/Wordmark.astro';
 import SignalMonitor from '../../components/SignalMonitor.astro';
 import ResearcherCard from '../../components/ResearcherCard.astro';
 import Email from '../../components/Email.astro';
+import Twin2D from '../../twin/Twin2D.astro';
 import { available, loadLab } from '../../lib/lab';
 import { href, localePaths, pick, useT, type Locale } from '../../i18n/ui';
 
@@ -77,6 +78,8 @@ const org = {
       </ul>
     </div>
   </section>
+
+  <Twin2D lab={lab} locale={locale} heading={pick(h.twin_heading, locale)} intro={pick(h.twin_intro, locale)} />
 
   <section class="wrap section unique" aria-labelledby="unique-h">
     <div class="unique-text">

@@ -1,0 +1,201 @@
+/**
+ * Build-time geometry for the 2D digital twin: isometric projection of the scene in
+ * src/content/twin.yaml into SVG polygons. Each object becomes boxes (drawn in painter's
+ * order) plus a silhouette used as its hotspot outline. No runtime code.
+ *
+ * Coordinates: metres; x right, y towards the viewer, z up. The viewer looks from the
+ * (+x, +y) corner, so a box shows its top, its +y ("front") and its +x ("side") faces.
+ */
+
+export type Box = { x: number; y: number; z: number; w: number; d: number; h: number };
+export type Pt = [number, number];
+export type SceneObject = Box & { object?: string; kind: string; count?: number };
+
+const S = 46; // pixels per metre
+const C = Math.cos(Math.PI / 6);
+const SN = Math.sin(Math.PI / 6);
+
+export function project(x: number, y: number, z: number): Pt {
+  return [(x - y) * C * S, (x + y) * SN * S - z * S];
+}
+
+const pts = (p: Pt[]) => p.map(([a, b]) => `${a.toFixed(1)},${b.toFixed(1)}`).join(' ');
+
+/** The three visible faces of a box, as SVG point lists. */
+export function boxFaces(b: Box) {
+  const { x, y, z, w, d, h } = b;
+  const P = (dx: number, dy: number, dz: number) => project(x + dx, y + dy, z + dz);
+  return {
+    top: pts([P(0, 0, h), P(w, 0, h), P(w, d, h), P(0, d, h)]),
+    front: pts([P(0, d, 0), P(w, d, 0), P(w, d, h), P(0, d, h)]),
+    side: pts([P(w, 0, 0), P(w, d, 0), P(w, d, h), P(w, 0, h)]),
+  };
+}
+
+function corners(b: Box): Pt[] {
+  const out: Pt[] = [];
+  for (const dx of [0, b.w]) for (const dy of [0, b.d]) for (const dz of [0, b.h]) out.push(project(b.x + dx, b.y + dy, b.z + dz));
+  return out;
+}
+
+/** Convex hull (Andrew's monotone chain). */
+export function hull(points: Pt[]): Pt[] {
+  const p = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (p.length < 3) return p;
+  const cross = (o: Pt, a: Pt, b: Pt) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower: Pt[] = [];
+  for (const q of p) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], q) <= 0) lower.pop();
+    lower.push(q);
+  }
+  const upper: Pt[] = [];
+  for (const q of p.reverse()) {
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], q) <= 0) upper.pop();
+    upper.push(q);
+  }
+  return lower.slice(0, -1).concat(upper.slice(0, -1));
+}
+
+/** Spread `n` points evenly around a rectangle's perimeter. */
+function perimeter(x: number, y: number, w: number, d: number, n: number): Array<[number, number]> {
+  const len = 2 * (w + d);
+  const out: Array<[number, number]> = [];
+  for (let i = 0; i < n; i++) {
+    let t = ((i + 0.5) / n) * len;
+    if (t < w) out.push([x + t, y]);
+    else if ((t -= w) < d) out.push([x + w, y + t]);
+    else if ((t -= d) < w) out.push([x + w - t, y + d]);
+    else out.push([x, y + d - (t - w)]);
+  }
+  return out;
+}
+
+/**
+ * Boxes that make up one object. `groups` splits them into separate hotspot silhouettes
+ * (a camera array is twelve small shapes, not one huge hull over the room).
+ */
+export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
+  const { x, y, z, w, d, h } = o;
+  const one = (boxes: Box[]) => ({ boxes, groups: [boxes] });
+  switch (o.kind) {
+    case 'desk':
+      return one(deskBoxes(o));
+    case 'workstation': {
+      const desk = deskBoxes(o);
+      const top = z + h;
+      const screens: Box[] = [
+        { x: x + w * 0.18, y: y + 0.12, z: top, w: 0.62, d: 0.06, h: 0.42 },
+        { x: x + w * 0.55, y: y + 0.12, z: top, w: 0.62, d: 0.06, h: 0.42 },
+        { x: x + w * 0.3, y: y + d * 0.55, z: top, w: 0.5, d: 0.18, h: 0.03 },
+      ];
+      const tower: Box = { x: x + w + 0.05, y: y + 0.1, z, w: 0.25, d: 0.5, h: 0.55 };
+      return one([...desk, tower, ...screens]);
+    }
+    case 'tripod': {
+      const pole = 0.04;
+      return one([
+        { x: x + w / 2 - 0.22, y: y + d / 2 - 0.22, z, w: 0.44, d: 0.44, h: 0.02 },
+        { x: x + w / 2 - pole / 2, y: y + d / 2 - pole / 2, z, w: pole, d: pole, h: h - 0.16 },
+        { x, y, z: z + h - 0.16, w, d, h: 0.16 },
+      ]);
+    }
+    case 'cart':
+      return one([
+        { x, y, z: z + 0.08, w, d, h: 0.04 },
+        { x: x + 0.03, y: y + 0.03, z, w: 0.04, d: 0.04, h },
+        { x: x + w - 0.07, y: y + d - 0.07, z, w: 0.04, d: 0.04, h },
+        { x, y, z: z + h - 0.04, w, d, h: 0.04 },
+        { x: x + w * 0.2, y: y + d * 0.2, z: z + h, w: w * 0.6, d: d * 0.6, h: 0.16 },
+      ]);
+    case 'camera-array': {
+      const n = o.count ?? 8;
+      const c = 0.2;
+      const t = 0.05; // truss thickness
+      const truss: Box[] = [
+        { x, y, z, w, d: t, h: t },
+        { x, y: y + d - t, z, w, d: t, h: t },
+        { x, y, z, w: t, d, h: t },
+        { x: x + w - t, y, z, w: t, d, h: t },
+      ];
+      const cams = perimeter(x, y, w, d, n).map(([cx, cy]) => ({ x: cx - c / 2, y: cy - c / 2, z: z - c, w: c, d: c, h: c + 0.04 }));
+      return { boxes: [...truss, ...cams], groups: cams.map((b) => [b]) };
+    }
+    case 'anchors': {
+      const n = o.count ?? 4;
+      const a = 0.14;
+      const corners4: Array<[number, number]> = [[x, y], [x + w, y], [x + w, y + d], [x, y + d]];
+      const at = n === 4 ? corners4 : perimeter(x, y, w, d, n);
+      const boxes = at.map(([ax, ay]) => ({ x: Math.min(ax, x + w - a), y: Math.min(ay, y + d - a), z, w: a, d: a, h }));
+      return { boxes, groups: boxes.map((b) => [b]) };
+    }
+    case 'person': {
+      // A stylised participant: legs, torso, head.
+      const cx = x + w / 2;
+      const cy = y + d / 2;
+      return one([
+        { x: cx - 0.17, y: cy - 0.08, z, w: 0.13, d: 0.16, h: h * 0.48 },
+        { x: cx + 0.04, y: cy - 0.08, z, w: 0.13, d: 0.16, h: h * 0.48 },
+        { x: cx - 0.21, y: cy - 0.11, z: z + h * 0.48, w: 0.42, d: 0.22, h: h * 0.36 },
+        { x: cx - 0.1, y: cy - 0.1, z: z + h * 0.86, w: 0.2, d: 0.2, h: h * 0.14 },
+      ]);
+    }
+    case 'scanner':
+      return one([
+        { x, y, z, w, d: d * 0.35, h },
+        { x: x + w * 0.2, y: y + d * 0.35, z, w: w * 0.6, d: d * 0.65, h: h * 0.45 },
+      ]);
+    case 'rack':
+      return one([
+        { x, y, z, w, d, h },
+      ]);
+    case 'plate':
+    case 'box':
+    default:
+      return one([{ x, y, z, w, d, h }]);
+  }
+}
+
+function deskBoxes(o: Box): Box[] {
+  const { x, y, z, w, d, h } = o;
+  const leg = 0.05;
+  return [
+    { x: x + 0.04, y: y + 0.04, z, w: leg, d: leg, h: h - 0.04 },
+    { x: x + w - 0.09, y: y + 0.04, z, w: leg, d: leg, h: h - 0.04 },
+    { x: x + 0.04, y: y + d - 0.09, z, w: leg, d: leg, h: h - 0.04 },
+    { x: x + w - 0.09, y: y + d - 0.09, z, w: leg, d: leg, h: h - 0.04 },
+    { x, y, z: z + h - 0.04, w, d, h: 0.04 },
+  ];
+}
+
+/** Painter's order: far (small x+y) and low first. */
+export const depth = (b: Box) => b.x + b.w / 2 + (b.y + b.d / 2) + b.z * 0.01;
+
+/** Silhouette (SVG points) for a group of boxes, slightly padded. */
+export function silhouette(group: Box[], pad = 4): string {
+  const h = hull(group.flatMap(corners));
+  const cx = h.reduce((s, p) => s + p[0], 0) / h.length;
+  const cy = h.reduce((s, p) => s + p[1], 0) / h.length;
+  return pts(
+    h.map(([a, b]) => {
+      const dx = a - cx;
+      const dy = b - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return [a + (dx / len) * pad, b + (dy / len) * pad] as Pt;
+    }),
+  );
+}
+
+/** Top-centre of a group in screen space (for labels). */
+export function anchor(boxes: Box[]): Pt {
+  const all = boxes.flatMap(corners);
+  const minY = Math.min(...all.map((p) => p[1]));
+  const xs = all.map((p) => p[0]);
+  return [(Math.min(...xs) + Math.max(...xs)) / 2, minY];
+}
+
+/** Floor rectangle as SVG points. */
+export function floorRect(x: number, y: number, w: number, d: number, z = 0): string {
+  return pts([project(x, y, z), project(x + w, y, z), project(x + w, y + d, z), project(x, y + d, z)]);
+}
+
+export { pts };
