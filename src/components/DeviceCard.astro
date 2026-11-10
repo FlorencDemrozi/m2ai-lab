@@ -65,12 +65,12 @@ const qty = d.quantity ? `${d.quantity}×` : d.quantity_note ? pick(d.quantity_n
     </ul>
   )}
   <div class="actions">
-    <a class="more" href={href(locale, 'devices', device.id)} aria-label={`${t('device.more')}: ${name}`}>
-      {t('device.more')} <Icon name="arrow" size={18} />
+    <a class="more" href={href(locale, 'devices', device.id)}>
+      {t('device.more')}<span class="sr-only">: {name}</span> <Icon name="arrow" size={18} />
     </a>
     {d.url && (
-      <a class="ext" href={d.url} rel="noopener external" aria-label={`${t('device.url')}: ${name} (${t('device.urlHint')})`}>
-        {t('device.url')} <Icon name="external" size={16} />
+      <a class="ext" href={d.url} rel="noopener external">
+        {t('device.url')}<span class="sr-only">: {name} ({t('device.urlHint')})</span> <Icon name="external" size={16} />
       </a>
     )}
   </div>

@@ -6,8 +6,14 @@
 import { Image } from 'astro:assets';
 import type { Researcher } from '../lib/lab';
 import { href, pick, type Locale } from '../i18n/ui';
-interface Props { researcher: Researcher; locale: Locale; level?: 2 | 3 }
-const { researcher, locale, level = 3 } = Astro.props;
+interface Props {
+  researcher: Researcher;
+  locale: Locale;
+  level?: 2 | 3;
+  /** Above the fold (first row): load the photo eagerly with high priority. */
+  eager?: boolean;
+}
+const { researcher, locale, level = 3, eager = false } = Astro.props;
 const r = researcher.data;
 const H = `h${level}` as 'h2' | 'h3';
 const initials = r.name
@@ -19,7 +25,7 @@ const initials = r.name
 ---
 <article class="researcher">
   {r.photo && r.consent ? (
-    <Image src={r.photo} alt="" widths={[200, 400]} sizes="(min-width: 62rem) 200px, 45vw" class="photo" loading="lazy" />
+    <Image src={r.photo} alt="" widths={[200, 400]} sizes="(min-width: 62rem) 200px, 45vw" class="photo" loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} />
   ) : (
     <span class="photo initials" aria-hidden="true">{initials}</span>
   )}
