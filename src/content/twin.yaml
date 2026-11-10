@@ -58,5 +58,4 @@ scene:
     - { object: force_platforms, kind: plate, x: 2.55, y: 3.5, w: 1.2, d: 1.8, h: 0.04 }
     - { object: microphone_array, kind: box, x: 2.75, y: 4.0, z: 2.5, w: 0.8, d: 0.8, h: 0.05 }
     - { object: uwb_rtls, kind: anchors, x: 0.15, y: 0.15, z: 2.3, w: 8.6, d: 8.45, h: 0.12, points: [[0.15, 0.15], [8.6, 0.15], [0.15, 8.5], [5.85, 8.5]] }
-    - { object: markerless_depth_cameras, kind: tripod, x: 3.05, y: 8.45, w: 0.2, d: 0.2, h: 1.6 }
     - { object: screen_eye_tracker, kind: box, x: 5.9, y: 3.45, z: 0.81, w: 0.1, d: 0.4, h: 0.04 }

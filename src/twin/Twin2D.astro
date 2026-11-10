@@ -13,7 +13,6 @@
 import DeviceCard from '../components/DeviceCard.astro';
 import StatusBadge from '../components/StatusBadge.astro';
 import SourceBadge from '../components/SourceBadge.astro';
-import Email from '../components/Email.astro';
 import Icon from '../components/Icon.astro';
 import type { Device, Lab } from '../lib/lab';
 import { href, pick, useT, type Locale } from '../i18n/ui';
@@ -228,7 +227,7 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
             {lab.device.applications(d).map((a, k) => <>{k > 0 && ', '}<a href={href(locale, 'applications', a.id)}>{pick(a.data.name, locale)}</a></>)}
             {lab.device.applications(d).length > 0 && <span aria-hidden="true"> · </span>}
             {lab.device.researchers(d).map((r, k) => (
-              <>{k > 0 && ', '}<a href={href(locale, 'researchers', r.id)}>{r.data.name}</a>{r.data.email && <> <Email address={r.data.email} label={t('researcher.emailTo', { name: r.data.name })} iconOnly /></>}</>
+              <>{k > 0 && ', '}<a href={href(locale, 'researchers', r.id)}>{r.data.name}</a></>
             ))}
           </p>
         </li>
@@ -348,7 +347,14 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
     position: absolute; z-index: 5; width: min(22rem, calc(100% - 16px));
     max-height: calc(100% - 16px); overflow: auto;
     border-radius: var(--radius); box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.7), 0 0 0 1px var(--line);
+    /* Frosted glass: the map stays visible behind the card, the blur keeps the text legible. */
+    --pop-opacity: 85%;
+    background: color-mix(in srgb, var(--bg-raised) var(--pop-opacity), transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
   }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .pop { background: var(--bg-raised); } }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .pop { background: var(--bg-raised); } }
   .pop[hidden] { display: none; }
   .pop:focus { outline: none; }
   .pop:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -358,7 +364,7 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
     display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px;
     background: var(--bg-sunken); color: var(--ink); border: 1px solid var(--line); cursor: pointer;
   }
-  .pop :global(.device-card) { padding-right: calc(var(--space-5) + 36px); }
+  .pop :global(.device-card) { padding-right: calc(var(--space-5) + 36px); background: transparent; }
   @media (hover: hover) { .pop :global(.device-card:hover) { transform: none; } }
 
   .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2) var(--space-5); padding: var(--space-3) var(--space-5); border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--ink-soft); }

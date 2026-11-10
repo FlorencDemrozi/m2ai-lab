@@ -5,7 +5,6 @@ import Base from '../../../layouts/Base.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
 import SourceBadge from '../../../components/SourceBadge.astro';
 import Icon from '../../../components/Icon.astro';
-import Email from '../../../components/Email.astro';
 import { loadLab, type Device } from '../../../lib/lab';
 import { href, localeParam, LOCALES, pick, useT, type Locale } from '../../../i18n/ui';
 
@@ -70,7 +69,6 @@ const pubs = lab.device.publications(device);
             {lab.device.researchers(device).map((r) => (
               <li>
                 <a href={href(locale, 'researchers', r.id)}>{r.data.name}</a>
-                {r.data.email && <Email address={r.data.email} label={t('researcher.emailTo', { name: r.data.name })} iconOnly />}
               </li>
             ))}
           </ul>
