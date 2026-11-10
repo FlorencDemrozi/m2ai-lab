@@ -8,6 +8,7 @@ const { locale, lab, altHref } = Astro.props;
 const t = useT(locale);
 const s = lab.settings;
 const other = locale === 'en' ? 'nb' : 'en';
+const [creditBefore, creditAfter = ''] = s.credit ? pick(s.credit.text, locale).split('{name}') : [];
 ---
 <footer class="site-footer">
   <div class="wrap cols">
@@ -35,6 +36,9 @@ const other = locale === 'en' ? 'nb' : 'en';
       <p class="muted">{t('footer.privacy')}</p>
     </div>
   </div>
+  {s.credit && (
+    <p class="wrap credit">{creditBefore}<a href={s.credit.url}>{s.credit.name}</a>{creditAfter}</p>
+  )}
 </footer>
 <style>
   .site-footer {
@@ -51,4 +55,9 @@ const other = locale === 'en' ? 'nb' : 'en';
   address { font-style: normal; margin-bottom: var(--space-4); }
   .small li { margin-bottom: var(--space-2); }
   a { color: var(--ink); }
+  .credit {
+    margin-top: var(--space-6); padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft); text-align: center;
+  }
 </style>

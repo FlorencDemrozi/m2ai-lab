@@ -18,4 +18,11 @@ lab:
     - "4021 Stavanger, Norway"
   optitrack_area_m: [5, 8]
   social: []
+  # Footer credit; {name} becomes a link to credit.url.
+  credit:
+    text:
+      en: "Designed with ❤️ and ☕ at the Department of Electrical Engineering and Computer Science (IDE) by {name}, Professor in Biomedical Sensing Systems, University of Stavanger."
+      no: "Designet med ❤️ og ☕ ved Institutt for data- og elektroteknologi (IDE) av {name}, professor i biomedisinske sensorsystemer, Universitetet i Stavanger."
+    name: "Florenc Demrozi"
+    url: https://florencdemrozi.github.io/
   placeholder_fields: [lab_email, address, tagline.no, lab_full_name.no]

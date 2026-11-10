@@ -260,6 +260,7 @@ const settings = defineCollection({
     visiting: localized.optional(),
     optitrack_area_m: z.tuple([z.number(), z.number()]),
     social: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
+    credit: z.object({ text: localized, name: z.string(), url: z.url() }).optional(),
     placeholder_fields: z.array(z.string()).default([]),
   }),
 });
