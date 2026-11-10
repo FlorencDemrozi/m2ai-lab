@@ -1,4 +1,0 @@
-name: { en: "Motion & biomechanics", no: "Bevegelse og biomekanikk" }
-subtitle: { en: "Optical motion capture, full-body IMU networks, EMG + IMU body sensor networks, force platforms and smart insoles." }
-icon: motion
-order: 1

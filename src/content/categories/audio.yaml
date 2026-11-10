@@ -1,0 +1,6 @@
+name: { en: "Audio sensing", no: "Lydsensing" }
+short: "AUDIO"
+subtitle: { en: "Room microphone arrays and wearable microphones for behavioural and interaction sensing." }
+icon: audio
+featured: false
+order: 10

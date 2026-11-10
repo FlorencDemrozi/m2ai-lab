@@ -3,7 +3,10 @@
  * theme (data-theme on <html>).
  *
  * PROVISIONAL: UiS visual-profile colours/fonts are not confirmed yet (TODO-content.md).
- * --accent is the MMAI accent used for highlights and device glow.
+ * --accent is the m²AI accent used for highlights and device glow. --sig-* colour the
+ * decorative signal traces only (never text), so they are not contrast-checked.
+ * .scope-dark forces the dark palette on one region (the hero 'instrument panel'),
+ * whatever the page theme; keep it identical to the dark block below.
  * Text/background pairs are checked for WCAG AA by scripts/contrast.mjs.
  */
 :root {
@@ -33,6 +36,16 @@
   --unconfirmed: #8a3b00;
 
   --focus: #1f5fd6;
+
+  --accent-2: #6b4fd8;
+  --sig-1: #12c9bb;
+  --sig-2: #ff7a59;
+  --sig-3: #9b8cff;
+  --sig-4: #ffd166;
+  --sig-5: #ff5d8f;
+  --sig-6: #5ab8ff;
+  --sig-7: #7ee081;
+  --grid-line: rgb(11 18 32 / 0.06);
 
   --font-display: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter Variable', 'Segoe UI', system-ui, sans-serif;
@@ -70,8 +83,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #070b14;
-    --bg-raised: #0f1626;
+    --bg: #05080f;
+    --bg-raised: #0c1322;
     --bg-sunken: #0b111e;
     --ink: #e8edf5;
     --ink-soft: #a3aec2;
@@ -92,13 +105,15 @@
     --unconfirmed: #ffab70;
     --focus: #8ab4ff;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+    --accent-2: #9b8cff;
+    --grid-line: rgb(79 224 210 / 0.07);
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #070b14;
-  --bg-raised: #0f1626;
+  --bg: #05080f;
+  --bg-raised: #0c1322;
   --bg-sunken: #0b111e;
   --ink: #e8edf5;
   --ink-soft: #a3aec2;
@@ -119,4 +134,36 @@
   --unconfirmed: #ffab70;
   --focus: #8ab4ff;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  --accent-2: #9b8cff;
+  --grid-line: rgb(79 224 210 / 0.07);
+}
+
+.scope-dark {
+  color-scheme: dark;
+  --bg: #05080f;
+  --bg-raised: #0c1322;
+  --bg-sunken: #0b111e;
+  --ink: #e8edf5;
+  --ink-soft: #a3aec2;
+  --line: #233049;
+  --line-strong: #6a7a99;
+  --accent: #4fe0d2;
+  --accent-ink: #04201e;
+  --accent-soft: #0d3433;
+  --glow: #4fe0d2;
+  --status-installed: #6fdc96;
+  --status-installed-bg: #0f2a1a;
+  --status-acquiring: #f5be63;
+  --status-acquiring-bg: #2e2109;
+  --status-planned: #b3b7ff;
+  --status-planned-bg: #1d1f3d;
+  --status-retired: #a8afbd;
+  --status-retired-bg: #1b2130;
+  --unconfirmed: #ffab70;
+  --focus: #8ab4ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  --accent-2: #9b8cff;
+  --grid-line: rgb(79 224 210 / 0.07);
+  background: var(--bg);
+  color: var(--ink);
 }

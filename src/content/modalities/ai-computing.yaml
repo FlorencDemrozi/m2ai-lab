@@ -1,4 +1,0 @@
-name: { en: "AI & computing", no: "KI og databehandling" }
-subtitle: { en: "Edge-AI nodes, GPU workstation, research storage, real-time processing and sensor fusion." }
-icon: compute
-order: 7

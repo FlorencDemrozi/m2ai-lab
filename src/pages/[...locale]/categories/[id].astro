@@ -1,0 +1,40 @@
+---
+import Base from '../../../layouts/Base.astro';
+import DeviceCard from '../../../components/DeviceCard.astro';
+import Icon from '../../../components/Icon.astro';
+import StatusCounts from '../../../components/StatusCounts.astro';
+import { loadLab, statusCounts, type Category } from '../../../lib/lab';
+import { href, localeParam, LOCALES, pick, useT, type Locale } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const lab = await loadLab();
+  return LOCALES.flatMap((locale) =>
+    lab.categories.map((category) => ({ params: { locale: localeParam(locale), id: category.id }, props: { locale, category } })),
+  );
+}
+const { locale, category } = Astro.props as { locale: Locale; category: Category };
+const t = useT(locale);
+const lab = await loadLab();
+const name = pick(category.data.name, locale);
+const devices = lab.category.devices(category);
+---
+<Base locale={locale} segments={['categories', category.id]} title={name} description={pick(category.data.subtitle, locale)}>
+  <header class="wrap page-head">
+    <p class="eyebrow"><a href={href(locale, 'devices')}>{t('catalogue.title')}</a> / {t('categories.title')}</p>
+    <h1><span class="glyph" aria-hidden="true"><Icon name={category.data.icon} size={36} /></span>{name}</h1>
+    <p class="lede">{pick(category.data.subtitle, locale)}</p>
+    <StatusCounts counts={statusCounts(devices)} locale={locale} />
+  </header>
+  <div class="wrap">
+    <h2 class="sr-only">{t('category.devices')}</h2>
+    <ul class="grid" role="list">{devices.map((d) => <li><DeviceCard device={d} lab={lab} locale={locale} compact={d.data.accessory} /></li>)}</ul>
+  </div>
+</Base>
+<style>
+  .eyebrow a { color: inherit; }
+  h1 { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .glyph {
+    display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px;
+    color: var(--accent); background: var(--accent-soft);
+  }
+</style>

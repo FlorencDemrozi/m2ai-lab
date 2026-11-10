@@ -1,5 +1,6 @@
 ---
 import Email from './Email.astro';
+import Wordmark from './Wordmark.astro';
 import { href, pick, useT, type Locale } from '../i18n/ui';
 import type { Lab } from '../lib/lab';
 interface Props { locale: Locale; lab: Lab; altHref: string }
@@ -11,8 +12,8 @@ const other = locale === 'en' ? 'nb' : 'en';
 <footer class="site-footer">
   <div class="wrap cols">
     <div>
-      <p class="brand">{s.lab_name}</p>
-      <p class="muted">{pick(s.lab_full_name, locale)} · {pick(s.tagline, locale)}</p>
+      <p class="brand"><Wordmark name={s.lab_name} /></p>
+      <p class="muted">{pick(s.lab_full_name, locale)}<br />{pick(s.tagline, locale)}</p>
       <p class="muted">
         {pick(s.department, locale)}<br />
         <a href={s.institution_url}>{pick(s.institution, locale)}</a>

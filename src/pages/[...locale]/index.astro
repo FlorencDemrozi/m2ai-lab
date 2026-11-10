@@ -1,13 +1,16 @@
 ---
 /**
- * Interim home page (Phase 1). Phase 2 replaces this with the full visitor journey:
- * hero render, digital twin, modality tiles, pipeline visual, application selector,
- * researchers and Collaborate (REQUIREMENTS §3).
+ * Home page (Phase 2, "Live signals" direction). All lab-specific copy comes from
+ * src/content/home.yaml and settings.yaml; numbers are computed from the device files.
+ * The digital twin (REQUIREMENTS §3.2) slots in after the hero once the render exists.
  */
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
-import StatusCounts from '../../components/StatusCounts.astro';
-import { loadLab, statusCounts } from '../../lib/lab';
+import Wordmark from '../../components/Wordmark.astro';
+import SignalMonitor from '../../components/SignalMonitor.astro';
+import ResearcherCard from '../../components/ResearcherCard.astro';
+import Email from '../../components/Email.astro';
+import { available, loadLab } from '../../lib/lab';
 import { href, localePaths, pick, useT, type Locale } from '../../i18n/ui';
 
 export const getStaticPaths = localePaths;
@@ -15,63 +18,271 @@ const { locale } = Astro.props as { locale: Locale };
 const t = useT(locale);
 const lab = await loadLab();
 const s = lab.settings;
+const h = lab.home;
+
+const lanes = lab.featuredCategories.filter((c) => c.data.signal);
+const highlights = h.highlights
+  .map((x) => ({ device: lab.byId(x.device.id)!, label: pick(x.label, locale) }))
+  .filter((x) => x.device.data.quantity);
+const nowAvailable = available(lab.labDevices, { accessories: false });
+const tiles = lab.featuredCategories.map((c) => ({ c, items: available(lab.category.devices(c), { accessories: false }) }));
+const apps = lab.applications.map((a) => ({ a, n: available(lab.application.devices(a)).length }));
+const people = lab.researchers.filter((r) => r.data.active).slice(0, 6);
+const encode = (str: string) => [...str].map((ch) => `&#${ch.codePointAt(0)};`).join('');
 
 const org = {
   '@context': 'https://schema.org',
   '@type': 'ResearchOrganization',
   name: `${s.lab_name} — ${pick(s.lab_full_name, 'en')}`,
-  alternateName: s.lab_name,
+  alternateName: [s.lab_name, s.lab_name.replace('²', '2')],
   slogan: pick(s.tagline, 'en'),
   url: new URL(href('en'), Astro.site).href,
   parentOrganization: { '@type': 'CollegeOrUniversity', name: pick(s.institution, 'en'), url: s.institution_url },
   address: s.address.join(', '),
 };
 ---
-<Base locale={locale} description={`${pick(s.lab_full_name, locale)}, ${pick(s.institution, locale)}. ${pick(s.tagline, locale)}`} jsonLd={[org]}>
-  <section class="hero">
+<Base locale={locale} description={`${pick(s.lab_full_name, locale)}, ${pick(s.institution, locale)}. ${pick(h.hero_intro, locale)}`} jsonLd={[org]}>
+  <section class="hero scope-dark" aria-labelledby="hero-h">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">{pick(s.institution, locale)}</p>
+        <h1 id="hero-h">
+          <Wordmark name={s.lab_name} class="big" />
+          <span class="full">{pick(s.lab_full_name, locale)}</span>
+        </h1>
+        <p class="tagline">{pick(s.tagline, locale)}</p>
+        <p class="intro">{pick(h.hero_intro, locale)}</p>
+        <p class="ctas">
+          <a class="btn btn-primary" href={href(locale, 'devices')}>{t('home.explore')} <Icon name="arrow" size={18} /></a>
+          <Fragment set:html={`<a class="btn btn-ghost" href="${encode('mailto:' + s.lab_email)}">${t('home.collaborate')}</a>`} />
+        </p>
+      </div>
+      <div class="hero-visual">
+        <SignalMonitor
+          lanes={lanes}
+          label={t('home.monitor', { lanes: lanes.map((c) => pick(c.data.name, locale)).join(', ') })}
+          syncLabel={pick(h.sync_label, locale)}
+          liveLabel={t('home.live')}
+        />
+      </div>
+    </div>
     <div class="wrap">
-      <h1>
-        <span class="name">{s.lab_name}</span>
-        <span class="full">{pick(s.lab_full_name, locale)}</span>
-      </h1>
-      <p class="tagline">{pick(s.tagline, locale)}</p>
-      <p class="notice wip">{t('home.wip')}</p>
+      <ul class="stats" role="list">
+        {highlights.map((x) => (
+          <li><span class="n">{x.device.data.quantity}</span><span class="l">{x.label}</span></li>
+        ))}
+        <li><span class="n">{nowAvailable.length}</span><span class="l">{t('home.statAvailable')}</span></li>
+        <li><span class="n">{lab.featuredCategories.length}</span><span class="l">{t('home.statCategories')}</span></li>
+      </ul>
     </div>
   </section>
 
-  <section class="wrap section" aria-labelledby="mod-h">
-    <h2 id="mod-h">{t('modalities.title')}</h2>
-    <ul class="grid" role="list">
-      {lab.modalities.map((m) => (
+  <section class="wrap section unique" aria-labelledby="unique-h">
+    <div class="unique-text">
+      <p class="eyebrow">{pick(h.unique_eyebrow, locale)}</p>
+      <h2 id="unique-h">{pick(h.unique_heading, locale)}</h2>
+      <p class="lede">{pick(h.unique_body, locale)}</p>
+    </div>
+    <h3 class="sr-only">{t('home.pipeline')}</h3>
+    <ol class="pipeline" role="list">
+      {h.pipeline.map((step, i) => (
         <li>
-          <a class="tile" href={href(locale, 'modalities', m.id)}>
-            <Icon name={m.data.icon} size={32} />
-            <span class="tile-name">{pick(m.data.name, locale)}</span>
-            <span class="tile-sub">{pick(m.data.subtitle, locale)}</span>
-            <StatusCounts counts={statusCounts(lab.modality.devices(m))} locale={locale} />
+          <span class="step-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="step-icon" aria-hidden="true"><Icon name={step.icon} size={26} /></span>
+          <h4>{pick(step.title, locale)}</h4>
+          <p>{pick(step.body, locale)}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="wrap section" aria-labelledby="cat-h">
+    <div class="section-head">
+      <h2 id="cat-h">{pick(h.categories_heading, locale)}</h2>
+      <p class="lede">{pick(h.categories_intro, locale)}</p>
+    </div>
+    <ul class="bento" role="list">
+      {tiles.map(({ c, items }, i) => (
+        <li class:list={{ wide: i === 0 }}>
+          <a class="tile" href={href(locale, 'categories', c.id)}>
+            <span class="tile-top">
+              <span class="tile-icon" aria-hidden="true"><Icon name={c.data.icon} size={28} /></span>
+              <span class="tile-short" aria-hidden="true">{c.data.short}</span>
+            </span>
+            <span class="tile-name">{pick(c.data.name, locale)}</span>
+            <span class="tile-sub">{pick(c.data.subtitle, locale)}</span>
+            <span class="tile-items">
+              {items.slice(0, i === 0 ? 4 : 3).map((d) => <span>{pick(d.data.name, locale)}</span>)}
+            </span>
+            <span class="tile-count">{t('count.installed', { n: items.length })} <Icon name="arrow" size={16} /></span>
           </a>
         </li>
       ))}
     </ul>
     <p class="more"><a class="btn btn-ghost" href={href(locale, 'devices')}>{t('home.explore')} <Icon name="arrow" size={18} /></a></p>
   </section>
+
+  <section class="wrap section" aria-labelledby="app-h">
+    <div class="section-head">
+      <h2 id="app-h">{pick(h.applications_heading, locale)}</h2>
+    </div>
+    <ul class="apps" role="list">
+      {apps.map(({ a, n }) => (
+        <li>
+          <a href={href(locale, 'applications', a.id)}>
+            <span class="app-name">{pick(a.data.name, locale)}</span>
+            <span class="app-n">{t('count.installed', { n })}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="wrap section" aria-labelledby="people-h">
+    <div class="section-head row">
+      <h2 id="people-h">{pick(h.researchers_heading, locale)}</h2>
+      <a class="all" href={href(locale, 'researchers')}>{t('home.allResearchers')} <Icon name="arrow" size={18} /></a>
+    </div>
+    <ul class="grid" role="list">
+      {people.map((r) => <li><ResearcherCard researcher={r} locale={locale} /></li>)}
+    </ul>
+  </section>
+
+  <section class="wrap collab-wrap" aria-labelledby="collab-h">
+    <div class="collab scope-dark">
+      <div>
+        <h2 id="collab-h">{pick(h.collaborate_heading, locale)}</h2>
+        <p>{pick(h.collaborate_body, locale)}</p>
+      </div>
+      <p class="collab-cta">
+        <Fragment set:html={`<a class="btn btn-primary" href="${encode('mailto:' + s.lab_email)}">${t('home.collaborate')}</a>`} />
+        <Email address={s.lab_email} class="collab-mail" />
+      </p>
+    </div>
+  </section>
 </Base>
 <style>
-  .hero { padding-block: var(--space-9) var(--space-7); }
-  h1 { font-size: var(--step-5); margin-bottom: var(--space-4); }
-  .name { display: block; }
-  .full { display: block; font-size: var(--step-2); font-weight: 500; color: var(--ink-soft); letter-spacing: -0.01em; margin-top: var(--space-2); }
-  .tagline { font-family: var(--font-display); font-size: var(--step-2); color: var(--accent); margin-bottom: var(--space-6); }
-  .wip { max-width: var(--max-text); }
-  .tile {
-    display: flex; flex-direction: column; gap: var(--space-2); height: 100%;
-    padding: var(--space-5); border-radius: var(--radius); border: 1px solid var(--line);
-    background: var(--bg-raised); color: var(--ink); text-decoration: none;
-    transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-8) var(--space-6);
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 48px 48px,
+      var(--bg);
+    border-bottom: 1px solid var(--line);
   }
-  .tile:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .tile :global(.icon) { color: var(--accent); }
-  .tile-name { font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; }
-  .tile-sub { color: var(--ink-soft); font-size: var(--step--1); flex: 1; }
+  .glow {
+    position: absolute; inset: -30% -10% auto auto; width: 70vw; height: 70vw; max-width: 900px; max-height: 900px;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%),
+      radial-gradient(closest-side at 30% 70%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-grid { position: relative; display: grid; gap: var(--space-7); align-items: center; }
+  .hero .eyebrow { color: var(--ink-soft); }
+  h1 { margin-bottom: var(--space-4); }
+  h1 :global(.big) { display: block; font-size: clamp(2.6rem, 1rem + 4.6vw, 5.25rem); line-height: 0.95; }
+  .full { display: block; font-size: var(--step-1); font-weight: 500; color: var(--ink-soft); letter-spacing: -0.005em; margin-top: var(--space-3); max-width: 30ch; }
+  .tagline {
+    font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; margin-bottom: var(--space-4);
+    background: linear-gradient(90deg, var(--accent), var(--ink));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  @media (forced-colors: active) { .tagline { color: CanvasText; background: none; } }
+  .intro { color: var(--ink-soft); max-width: 40rem; margin-bottom: var(--space-6); }
+  .ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .hero :global(.btn-ghost) { color: var(--ink); border-color: var(--line-strong); }
+
+  .stats {
+    position: relative;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: 1px; margin-top: var(--space-7);
+    border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--line);
+  }
+  .stats li { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4) var(--space-5); background: color-mix(in srgb, var(--bg-raised) 85%, transparent); }
+  .stats .n { font-family: var(--font-display); font-size: var(--step-3); font-weight: 700; line-height: 1; color: var(--accent); }
+  .stats .l { font-size: var(--step--1); color: var(--ink-soft); }
+
+  @media (min-width: 62rem) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+  }
+
+  /* ---------- unique + pipeline ---------- */
+  .unique { display: grid; gap: var(--space-6); padding-block: var(--space-8) var(--space-6); }
+  .unique-text { max-width: 52rem; }
+  .unique h2 { font-size: var(--step-3); max-width: 24ch; }
+  .pipeline { position: relative; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); counter-reset: step; }
+  .pipeline li {
+    position: relative; padding: var(--space-5); border-radius: var(--radius);
+    background: var(--bg-raised); border: 1px solid var(--line);
+  }
+  .pipeline li::after {
+    content: ''; position: absolute; top: 2.6rem; right: calc(-1 * var(--space-4)); width: var(--space-4); height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .pipeline li:last-child::after { display: none; }
+  .step-n { position: absolute; top: var(--space-4); right: var(--space-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-soft); }
+  .step-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; color: var(--accent); background: var(--accent-soft); margin-bottom: var(--space-4); }
+  .pipeline h4 { font-size: var(--step-1); margin-bottom: var(--space-2); }
+  .pipeline p { margin: 0; color: var(--ink-soft); font-size: var(--step--1); }
+
+  /* ---------- categories bento ---------- */
+  .section-head { margin-bottom: var(--space-6); }
+  .section-head.row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+  .section-head h2 { margin-bottom: var(--space-3); }
+  .bento { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+  @media (min-width: 48rem) { .bento .wide { grid-column: span 2; } }
+  .tile {
+    position: relative; display: flex; flex-direction: column; gap: var(--space-2); height: 100%;
+    padding: var(--space-5); border-radius: var(--radius-lg); border: 1px solid var(--line);
+    background: radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--glow) 9%, transparent), transparent 60%), var(--bg-raised);
+    color: var(--ink); text-decoration: none; overflow: hidden;
+    transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+  .tile:hover, .tile:focus-visible {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+    box-shadow: 0 16px 40px -18px color-mix(in srgb, var(--glow) 55%, transparent);
+  }
+  @media (hover: hover) { .tile:hover { transform: translateY(-3px); } }
+  .tile-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+  .tile-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; color: var(--accent); background: var(--accent-soft); }
+  .tile-short { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; color: var(--ink-soft); }
+  .tile-name { font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; line-height: 1.2; }
+  .wide .tile-name { font-size: var(--step-2); }
+  .tile-sub { color: var(--ink-soft); font-size: var(--step--1); }
+  .tile-items { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); margin-top: var(--space-2); flex: 1; align-content: flex-start; }
+  .tile-items span { font-size: 0.8rem; padding: 0.1em 0.6em; border-radius: 999px; background: var(--bg-sunken); color: var(--ink); }
+  .tile-count { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); font-weight: 600; font-size: var(--step--1); color: var(--accent); }
   .more { margin-top: var(--space-6); }
+
+  /* ---------- applications ---------- */
+  .apps { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+  .apps a {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); min-height: 56px;
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius); border: 1px solid var(--line);
+    background: var(--bg-raised); color: var(--ink); text-decoration: none; font-weight: 600;
+  }
+  .apps a:hover { border-color: var(--accent); }
+  .app-n { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; color: var(--ink-soft); white-space: nowrap; }
+  .all { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 600; min-height: 44px; }
+
+  /* ---------- collaborate ---------- */
+  .collab-wrap { padding-block: var(--space-7) 0; }
+  .collab {
+    position: relative; overflow: hidden;
+    display: grid; gap: var(--space-5); align-items: end;
+    padding: var(--space-7) var(--space-6); border-radius: var(--radius-lg);
+    background:
+      radial-gradient(80% 120% at 100% 100%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 60%),
+      radial-gradient(60% 100% at 0% 0%, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 60%),
+      var(--bg);
+    border: 1px solid var(--line);
+  }
+  .collab h2 { font-size: var(--step-3); max-width: 22ch; }
+  .collab p { color: var(--ink-soft); max-width: 46rem; margin: 0; }
+  .collab-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .collab-cta :global(.collab-mail) { color: var(--ink); }
+  @media (min-width: 56rem) { .collab { grid-template-columns: 1fr auto; } }
 </style>

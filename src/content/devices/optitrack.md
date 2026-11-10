@@ -1,17 +1,24 @@
 ---
-name: { en: "12-Camera OptiTrack Motion Capture System", no: "OptiTrack bevegelsesfangst med 12 kamera" }
-summary: { en: "High-precision 3D human motion capture across a 5 × 8 m experimental area." }
+name: { en: "OptiTrack PrimeX 22 motion capture", no: "OptiTrack PrimeX 22 bevegelsesfangst" }
+summary: { en: "Optical marker-based motion capture with sub-millimetre accuracy across a 5 × 8 m volume: the lab’s ground-truth reference for validating every other measure." }
 status: installed
-modalities: [motion-biomechanics]
+source: lab
+categories: [motion-capture]
+# TODO: confirm the responsible researcher (defaults to the PI) and the linked applications (guessed). See TODO-content.md.
 researchers: [florenc-demrozi]
 applications: [gait, balance, rehabilitation, har, upper-body, sports]
 manufacturer: "OptiTrack"
+model: "PrimeX 22"
 quantity: 12
-specs: { cameras: 12, mounting: ceiling, "capture area": "5 × 8 m" }
+specs: { cameras: 12, mounting: "ceiling", "capture area": "5 × 8 m" }
 sync: hardware
+url: https://www.optitrack.com/
+icon: motion
 twin_object: optitrack_cameras
 order: 10
 ---
-Twelve ceiling-mounted cameras track reflective markers in three dimensions across a
-5 × 8 m capture volume. The volume can be split into smaller virtual zones for studies
-that need less space, and recordings are hardware-synchronized with the lab's other sensors.
+Twelve ceiling-mounted PrimeX 22 cameras track reflective markers in three dimensions across a
+5 × 8 m capture volume. The volume can be split into smaller virtual zones for studies that
+need less space. Recordings are synchronized with the lab's other sensors through hardware
+TTL triggers and Lab Streaming Layer, so OptiTrack serves as the ground truth every other
+modality is validated against.

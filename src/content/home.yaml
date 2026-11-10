@@ -1,0 +1,39 @@
+# Copy for the home page. Exactly one entry, with the id "home".
+# Norwegian is left out for now and falls back to English (TODO-content.md).
+home:
+  hero_intro:
+    en: "We capture human behaviour, physiology and cognition at the same time: optical motion capture as ground truth, synchronized with muscle activity, brain activity, eye tracking, thermal imaging, radio-frequency sensing, XR and wearables, and processed on site with edge AI."
+  sync_label: { en: "One clock · hardware TTL + Lab Streaming Layer", no: "Én klokke · maskinvare-TTL + Lab Streaming Layer" }
+  highlights:
+    - device: optitrack
+      label: { en: "OptiTrack PrimeX 22 cameras", no: "OptiTrack PrimeX 22-kamera" }
+    - device: delsys-trigno-avanti
+      label: { en: "wireless EMG + IMU sensors", no: "trådløse EMG- og IMU-sensorer" }
+    - device: smartwatches
+      label: { en: "smartwatches for everyday sensing", no: "smartklokker for hverdagsmåling" }
+  unique_eyebrow: { en: "What makes the lab different", no: "Det som skiller laben" }
+  unique_heading: { en: "Every modality, recorded at once, against one ground truth.", no: "Alle modaliteter, tatt opp samtidig, mot én fasit." }
+  unique_body:
+    en: "Most labs measure one signal at a time. Here, motion, muscle, brain, gaze, heat and radio can all be recorded in the same session and aligned on a single timeline, with OptiTrack as the reference that every other measure is validated against. That is what lets us build and test multimodal AI on real people, not on stitched-together datasets."
+  pipeline:
+    - title: { en: "Sense", no: "Måle" }
+      body: { en: "Motion capture, EMG, EEG, eye tracking, thermal, RF and wearables on the same participant." }
+      icon: motion
+    - title: { en: "Synchronize", no: "Synkronisere" }
+      body: { en: "Hardware TTL triggers and Lab Streaming Layer put every stream on one clock." }
+      icon: sync
+    - title: { en: "Validate", no: "Validere" }
+      body: { en: "Sub-millimetre OptiTrack data is the ground truth for every other measure." }
+      icon: target
+    - title: { en: "Learn", no: "Lære" }
+      body: { en: "Edge AI on Jetson for real-time inference; the GPU workstation for training and analysis." }
+      icon: compute
+  categories_heading: { en: "One Lab. Multiple Modalities.", no: "Én lab. Mange modaliteter." }
+  categories_intro: { en: "Everything we can record, grouped by what it measures. Each item shows whether it belongs to the lab or is available through partners." }
+  applications_heading: { en: "Explore by application", no: "Utforsk etter bruksområde" }
+  researchers_heading: { en: "Meet the researchers", no: "Møt forskerne" }
+  collaborate_heading: { en: "Bring your technology into the m²AI BMD Lab", no: "Ta med teknologien din inn i m²AI BMD Lab" }
+  # PLACEHOLDER: the paragraph from the original brief is still missing (TODO-content.md).
+  collaborate_body:
+    en: "Have a sensor, a wearable or a model you want to test against motion-capture ground truth? We welcome companies, clinicians and researchers who want to validate new technology in a controlled, fully synchronized multimodal setting."
+  placeholder_fields: [collaborate_body, hero_intro.no, unique_body.no]

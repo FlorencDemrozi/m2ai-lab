@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import Wordmark from './Wordmark.astro';
 import { href, useT, type Locale } from '../i18n/ui';
 import type { Lab } from '../lib/lab';
 interface Props {
@@ -23,10 +24,11 @@ const other = locale === 'en' ? 'nb' : 'en';
 <header class="site-header">
   <div class="wrap bar">
     <a class="logo" href={href(locale)}>
-      <svg viewBox="0 0 40 24" width="34" height="20" aria-hidden="true">
-        <polyline points="0,12 9,12 12,3 16,21 20,12 40,12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
+        <path d="M1 5c5 0 7 7 15 7M1 19c5 0 7-7 15-7M1 12h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <path d="M16 12h4l2-6 3 12 2-6h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-      <span>{lab.settings.lab_name}</span>
+      <Wordmark name={lab.settings.lab_name} />
     </a>
     <nav aria-label={t('nav.primary')}>
       <!-- Wide screens: plain list. Narrow screens: <details> menu (works without JS).
@@ -96,7 +98,7 @@ const other = locale === 'en' ? 'nb' : 'en';
   .bar { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; position: relative; }
   .logo {
     display: inline-flex; align-items: center; gap: var(--space-2);
-    font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+    font-size: 1.15rem;
     color: var(--ink); text-decoration: none; min-height: 44px;
   }
   .logo svg { color: var(--accent); }

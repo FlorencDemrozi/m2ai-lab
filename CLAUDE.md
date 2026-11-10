@@ -1,9 +1,12 @@
-# MMAI Lab website — conventions for Claude Code
+# m²AI BMD Lab website — conventions for Claude Code
 
-Website for the **MMAI Lab — Multimodal AI Lab**, University of Stavanger (formerly "BMD Living Lab").
+Website for the **m²AI BMD Lab — Multimodal AI Biomedical Data Analysis Laboratory**, University of Stavanger
+(formerly "BMD Living Lab", then briefly "MMAI Lab"). Write the name with a real "²"; the URL-safe
+form for repository, package and domain is **`m2ai-lab`** (never `mmai-lab`).
 Tagline: **Sensing. Understanding. Improving Lives.** (full stops, not commas).
 
-Full spec: `docs/REQUIREMENTS.md` (converted from `docs/MMAI Lab Website — Requirements Brief.docx`; the .docx is the source of truth if they differ).
+Full spec: `docs/REQUIREMENTS.md` (converted from `docs/MMAI Lab Website — Requirements Brief.docx`; the .docx is the source of truth if they differ,
+except for the lab name, which changed after the brief).
 Missing real content is tracked in `TODO-content.md`.
 
 ## Repository layout
@@ -41,7 +44,11 @@ On Windows Git Bash, prefix env vars containing paths with `MSYS_NO_PATHCONV=1` 
   `planned`/`acquiring` are never presented as available; `retired` is hidden from lab views.
 - `twin_object` is the only link between content and the 3D/2D scene. A device without a twin shape still appears everywhere else and is flagged in the build log.
 - Bilingual fields `{ en, no }` (or a plain string = English); missing `no` falls back to `en`.
-- Devices carry `modalities: [...]` (array, ≥1) — not the singular `modality` from the brief's example.
+- Devices carry `categories: [...]` (array, ≥1, ids from `src/content/categories/`) — these replaced the brief's
+  "modalities" and follow the lab's equipment inventory. The first category is where the item is listed.
+- Devices carry `source` (`lab` | `personal` | `shared-uis` | `collaboration`), shown as a second text badge.
+  `status: installed` is labelled "Available" in the UI.
+- Official product links go in `url` ("More info"). Never hotlink or copy manufacturer images; use icons or our own photos.
 - Applications store no relations; their devices/researchers are derived from device files.
 - Placeholder images and dummy data must be clearly marked (`placeholder: true` / `TODO` in the file) and listed in `TODO-content.md`.
 - Motion capture is **OptiTrack** (12 ceiling cameras, ~5 × 8 m volume). The old site's "Qualisys" is wrong.
@@ -49,7 +56,7 @@ On Windows Git Bash, prefix env vars containing paths with `MSYS_NO_PATHCONV=1` 
 ## Technical rules
 
 - Astro + TypeScript + Zod; plain CSS with custom properties (light/dark tokens).
-- Near-zero JS by default; interactive islands only for the twin, application selector, theme/menu.
+- Near-zero JS by default; interactive islands only for the twin, application selector, equipment filter, theme/menu.
 - **Everything must work without JavaScript** (all content readable; twin interaction is the only loss).
 - Three.js only in Phase 3, lazy-loaded near the viewport; only when WebGL is available, the device is capable and reduced motion is off. 2D layer is the permanent fallback. Both layers share device data and the same card component.
 - No third-party trackers, CDNs or external fonts — self-host and subset fonts.

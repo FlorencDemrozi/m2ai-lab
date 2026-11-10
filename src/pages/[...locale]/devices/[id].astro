@@ -3,6 +3,8 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
+import SourceBadge from '../../../components/SourceBadge.astro';
+import Icon from '../../../components/Icon.astro';
 import Email from '../../../components/Email.astro';
 import { loadLab, type Device } from '../../../lib/lab';
 import { href, localeParam, LOCALES, pick, useT, type Locale } from '../../../i18n/ui';
@@ -27,13 +29,19 @@ const pubs = lab.device.publications(device);
   <article>
     <header class="wrap page-head">
       <p class="eyebrow">
-        {lab.device.modalities(device).map((m, i) => (
-          <>{i > 0 && ' · '}<a href={href(locale, 'modalities', m.id)}>{pick(m.data.name, locale)}</a></>
+        {lab.device.categories(device).map((c, i) => (
+          <>{i > 0 && ' · '}<a href={href(locale, 'categories', c.id)}>{pick(c.data.name, locale)}</a></>
         ))}
       </p>
-      <h1>{name}</h1>
-      <p><StatusBadge status={d.status} expected={d.expected} placeholder={d.placeholder} locale={locale} /></p>
+      <h1><span class="glyph" aria-hidden="true"><Icon name={lab.device.icon(device)} size={34} /></span>{name}</h1>
+      <p class="badges">
+        <StatusBadge status={d.status} expected={d.expected} placeholder={d.placeholder} locale={locale} />
+        <SourceBadge source={d.source} locale={locale} />
+      </p>
       <p class="lede">{pick(d.summary, locale)}</p>
+      {d.url && (
+        <p><a class="btn btn-ghost" href={d.url} rel="noopener external">{t('device.url')} <span class="sr-only">({t('device.urlHint')})</span><Icon name="external" size={18} /></a></p>
+      )}
       {d.placeholder && <p class="notice">{t('status.unconfirmedHint')}</p>}
     </header>
 
@@ -82,8 +90,10 @@ const pubs = lab.device.publications(device);
           <dl class="meta-list">
             {d.manufacturer && <><dt>{t('device.manufacturer')}</dt><dd>{d.manufacturer}</dd></>}
             {d.model && <><dt>{t('device.model')}</dt><dd>{d.model}</dd></>}
-            {d.quantity && <><dt>{t('device.quantity')}</dt><dd>{d.quantity}</dd></>}
-            <dt>{t('device.sync')}</dt><dd>{t(`sync.${d.sync}`)}</dd>
+            {(d.quantity || d.quantity_note) && <><dt>{t('device.quantity')}</dt><dd>{d.quantity ?? pick(d.quantity_note, locale)}</dd></>}
+            <dt>{t('device.source')}</dt><dd>{t(`source.hint.${d.source}`)}</dd>
+            {d.partner && <><dt>{t('device.partner')}</dt><dd>{pick(d.partner, locale)}</dd></>}
+            {d.sync !== 'unknown' && <><dt>{t('device.sync')}</dt><dd>{t(`sync.${d.sync}`)}</dd></>}
             {specs.map(([k, v]) => <><dt>{k.replaceAll('_', ' ')}</dt><dd>{Array.isArray(v) ? v.join(' × ') : String(v)}</dd></>)}
             {d.acquired && <><dt>{t('device.acquired')}</dt><dd>{d.acquired.toISOString().slice(0, 10)}</dd></>}
           </dl>
@@ -95,6 +105,12 @@ const pubs = lab.device.publications(device);
 </Base>
 <style>
   .eyebrow a { color: inherit; }
+  h1 { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .glyph {
+    display: grid; place-items: center; flex: none; width: 60px; height: 60px; border-radius: 16px;
+    color: var(--accent); background: var(--accent-soft);
+  }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .layout { display: grid; gap: var(--space-6); }
   .side { display: grid; gap: var(--space-4); align-content: start; }
   .h { font-size: var(--step-0); font-family: var(--font-body); letter-spacing: 0; margin-bottom: var(--space-3); }

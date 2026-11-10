@@ -1,4 +1,0 @@
-name: { en: "Vision & contactless sensing", no: "Syn og berøringsfri måling" }
-subtitle: { en: "RGB, thermal and depth cameras, radar and eye tracking." }
-icon: vision
-order: 3

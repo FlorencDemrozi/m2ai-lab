@@ -1,64 +1,185 @@
 ---
-/** Equipment catalogue: the one place a table view is fine (REQUIREMENTS §3.9). */
+/**
+ * Equipment catalogue, grouped by category (each item under its first category).
+ * Without JS everything is listed, with a jump list to each category. With JS a filter
+ * bar (category × availability) narrows the cards; the count is announced politely.
+ */
 import Base from '../../../layouts/Base.astro';
-import StatusBadge from '../../../components/StatusBadge.astro';
-import { loadLab } from '../../../lib/lab';
+import DeviceCard from '../../../components/DeviceCard.astro';
+import Icon from '../../../components/Icon.astro';
+import { loadLab, type Device } from '../../../lib/lab';
+import { SOURCES } from '../../../lib/constants';
 import { href, localePaths, pick, useT, type Locale } from '../../../i18n/ui';
 
 export const getStaticPaths = localePaths;
 const { locale } = Astro.props as { locale: Locale };
 const t = useT(locale);
 const lab = await loadLab();
+
+const current = lab.labDevices.filter((d) => d.data.status === 'installed');
+const upcoming = lab.labDevices.filter((d) => d.data.status !== 'installed');
+const primary = (d: Device) => d.data.categories[0].id;
+const groups = lab.categories
+  .map((c) => ({ c, items: current.filter((d) => primary(d) === c.id) }))
+  .filter((g) => g.items.length > 0);
+const sources = SOURCES.filter((s) => lab.labDevices.some((d) => d.data.source === s));
+const cats = lab.categories.filter((c) => lab.labDevices.some((d) => d.data.categories.some((x) => x.id === c.id)));
+const total = lab.labDevices.length;
+const sourceCount = (s: string) => current.filter((d) => d.data.source === s).length;
 ---
 <Base locale={locale} segments={['devices']} title={t('catalogue.title')} description={t('catalogue.description')}>
   <div class="wrap page-head">
     <h1>{t('catalogue.title')}</h1>
     <p class="lede">{t('catalogue.description')}</p>
+    <ul class="stats" role="list">
+      {sources.filter((s) => sourceCount(s) > 0).map((s) => (
+        <li><span class="n">{sourceCount(s)}</span> <span class="l">{t(`source.${s}`)}</span></li>
+      ))}
+    </ul>
   </div>
+
   <div class="wrap">
-    <div class="table-wrap" role="region" aria-labelledby="catalogue-caption" tabindex="0">
-      <table>
-        <caption id="catalogue-caption" class="sr-only">{t('catalogue.title')}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{t('catalogue.name')}</th>
-            <th scope="col">{t('catalogue.status')}</th>
-            <th scope="col">{t('catalogue.modality')}</th>
-            <th scope="col">{t('catalogue.contact')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lab.labDevices.map((d) => (
-            <tr data-status={d.data.status}>
-              <th scope="row">
-                <a href={href(locale, 'devices', d.id)}>{pick(d.data.name, locale)}</a>
-                <span class="summary">{pick(d.data.summary, locale)}</span>
-              </th>
-              <td><StatusBadge status={d.data.status} expected={d.data.expected} placeholder={d.data.placeholder} locale={locale} /></td>
-              <td>
-                {lab.device.modalities(d).map((m, i) => (
-                  <>{i > 0 && ', '}<a href={href(locale, 'modalities', m.id)}>{pick(m.data.name, locale)}</a></>
-                ))}
-              </td>
-              <td>
-                {lab.device.researchers(d).map((r, i) => (
-                  <>{i > 0 && ', '}<a href={href(locale, 'researchers', r.id)}>{r.data.name}</a></>
-                ))}
-              </td>
-            </tr>
+    <nav class="jump" aria-label={t('catalogue.jump')}>
+      <ul role="list">
+        {groups.map((g) => <li><a href={`#cat-${g.c.id}`}>{pick(g.c.data.name, locale)}</a></li>)}
+        {upcoming.length > 0 && <li><a href="#planned">{t('catalogue.planned')}</a></li>}
+      </ul>
+    </nav>
+
+    <form class="filters" data-filters hidden aria-label={t('catalogue.filters')} onsubmit="return false">
+      <fieldset>
+        <legend><Icon name="filter" size={16} /> {t('catalogue.filterCategory')}</legend>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="cat" value="" checked /><span>{t('catalogue.all')}</span></label>
+          {cats.map((c) => (
+            <label class="chip"><input type="radio" name="cat" value={c.id} /><span>{c.data.short}<span class="sr-only"> ({pick(c.data.name, locale)})</span></span></label>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>{t('catalogue.filterSource')}</legend>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="src" value="" checked /><span>{t('catalogue.all')}</span></label>
+          {sources.map((s) => (
+            <label class="chip"><input type="radio" name="src" value={s} /><span>{t(`source.${s}`)}</span></label>
+          ))}
+        </div>
+      </fieldset>
+      <p class="count" aria-live="polite" data-count data-template={t('catalogue.showing')} data-total={total}>
+        {t('catalogue.showing', { n: total, total })}
+      </p>
+      <p class="empty" data-empty hidden>{t('catalogue.empty')} <button type="reset" class="linklike">{t('catalogue.reset')}</button></p>
+    </form>
+
+    {groups.map((g) => (
+      <section class="group" id={`cat-${g.c.id}`} aria-labelledby={`h-${g.c.id}`} data-group>
+        <header class="group-head">
+          <span class="g-icon" aria-hidden="true"><Icon name={g.c.data.icon} size={22} /></span>
+          <h2 id={`h-${g.c.id}`}><a href={href(locale, 'categories', g.c.id)}>{pick(g.c.data.name, locale)}</a></h2>
+          <p class="g-sub">{pick(g.c.data.subtitle, locale)}</p>
+        </header>
+        <ul class="grid" role="list">
+          {g.items.map((d) => <li data-item><DeviceCard device={d} lab={lab} locale={locale} compact={d.data.accessory} /></li>)}
+        </ul>
+      </section>
+    ))}
+
+    {upcoming.length > 0 && (
+      <section class="group" id="planned" aria-labelledby="h-planned" data-group>
+        <header class="group-head">
+          <span class="g-icon" aria-hidden="true"><Icon name="target" size={22} /></span>
+          <h2 id="h-planned">{t('catalogue.planned')}</h2>
+          <p class="g-sub">{t('catalogue.plannedIntro')}</p>
+        </header>
+        <ul class="grid" role="list">
+          {upcoming.map((d) => <li data-item><DeviceCard device={d} lab={lab} locale={locale} compact /></li>)}
+        </ul>
+      </section>
+    )}
   </div>
 </Base>
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filters]');
+  if (form) {
+    form.hidden = false;
+    const items = [...document.querySelectorAll<HTMLElement>('[data-item]')];
+    const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+    const count = form.querySelector<HTMLElement>('[data-count]')!;
+    const empty = form.querySelector<HTMLElement>('[data-empty]')!;
+    const tpl = count.dataset.template ?? '{n} / {total}';
+    const total = count.dataset.total ?? String(items.length);
+    const apply = () => {
+      const data = new FormData(form);
+      const cat = String(data.get('cat') ?? '');
+      const src = String(data.get('src') ?? '');
+      let n = 0;
+      for (const li of items) {
+        const card = li.querySelector<HTMLElement>('[data-device]');
+        const ok =
+          (!cat || (card?.dataset.categories ?? '').split(' ').includes(cat)) &&
+          (!src || card?.dataset.source === src);
+        li.hidden = !ok;
+        if (ok) n++;
+      }
+      for (const g of groups) g.hidden = !g.querySelector('[data-item]:not([hidden])');
+      count.textContent = tpl.replace('{n}', String(n)).replace('{total}', total);
+      empty.hidden = n > 0;
+    };
+    form.addEventListener('change', apply);
+    form.addEventListener('reset', () => setTimeout(apply));
+  }
+</script>
 <style>
-  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-raised); }
-  table { width: 100%; border-collapse: collapse; font-size: var(--step--1); min-width: 44rem; }
-  th, td { text-align: left; vertical-align: top; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); }
-  thead th { font-weight: 600; color: var(--ink-soft); background: var(--bg-sunken); }
-  tbody tr:last-child > * { border-bottom: 0; }
-  tbody th { font-weight: 400; }
-  tbody th a { font-weight: 600; font-size: var(--step-0); }
-  .summary { display: block; color: var(--ink-soft); margin-top: var(--space-1); }
+  .stats { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+  .stats li {
+    display: inline-flex; align-items: baseline; gap: var(--space-2);
+    padding: var(--space-2) var(--space-4); border: 1px solid var(--line); border-radius: 999px; background: var(--bg-raised);
+  }
+  .stats .n { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); color: var(--accent); }
+  .stats .l { color: var(--ink-soft); font-size: var(--step--1); }
+
+  .jump ul { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); font-size: var(--step--1); }
+  .jump a { display: inline-flex; min-height: 44px; align-items: center; }
+
+  .filters {
+    position: sticky; top: 64px; z-index: 10;
+    display: grid; gap: var(--space-3);
+    margin-block: var(--space-5) var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+    backdrop-filter: blur(10px);
+  }
+  .filters[hidden] { display: none; }
+  fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  legend {
+    float: none; width: 100%; display: flex; align-items: center; gap: var(--space-1); padding: 0;
+    font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .chip span:first-of-type {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 0 0.85em;
+    border: 1px solid var(--line); border-radius: 999px; font-size: var(--step--1); font-weight: 500;
+    color: var(--ink); background: var(--bg);
+  }
+  .chip:hover span:first-of-type { border-color: var(--accent); }
+  .chip input:checked + span { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .count, .empty { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
+  .linklike { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font: inherit; cursor: pointer; min-height: 24px; }
+
+  .group { padding-block: var(--space-6); scroll-margin-top: 80px; }
+  .group[hidden] { display: none; }
+  .group-head { display: grid; grid-template-columns: auto 1fr; gap: var(--space-1) var(--space-3); align-items: center; margin-bottom: var(--space-5); }
+  .g-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; color: var(--accent); background: var(--accent-soft); }
+  .group-head h2 { margin: 0; font-size: var(--step-2); }
+  .group-head h2 a { color: inherit; text-decoration: none; }
+  .group-head h2 a:hover { text-decoration: underline; }
+  .g-sub { grid-column: 2; margin: 0; color: var(--ink-soft); max-width: var(--max-text); font-size: var(--step--1); }
+  li[hidden] { display: none; }
+  @media (max-width: 40rem) {
+    .filters { position: static; }
+  }
 </style>

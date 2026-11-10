@@ -1,0 +1,6 @@
+name: { en: "Thermal imaging", no: "Termisk avbildning" }
+short: "THERMAL"
+subtitle: { en: "Dual-spectrum thermal and visible cameras with radiometric temperature output, in wide and narrow fields of view." }
+icon: thermal
+signal: { shape: thermal }
+order: 5

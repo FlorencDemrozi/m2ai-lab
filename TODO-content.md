@@ -10,24 +10,33 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 
 ## Devices — `src/content/devices/`
 
-- [ ] **Confirm OptiTrack is `installed`.** Status, researcher and applications come from the brief's example file. In `applications`, the example's `fine-movement` became `upper-body`, and `biomechanics` was dropped because it is a modality, not an application.
-- [ ] **The other 21 devices are all `planned` + `placeholder: true`.** For each one, confirm or correct:
-  - status (`installed` / `acquiring` + expected date / `planned`)
-  - **responsible researcher(s)**: *guessed from each person's research focus on the old site*
-  - linked applications: *guessed*, apart from the brief's two examples (Gait, HAR)
-  - make, model, key specs, quantity, sync capability (hardware / software / none)
-  - photo
-- [ ] Devices in the new brief with **no file yet**: EMG + IMU body sensor networks, pressure systems, PPG, respiration, radar/contactless, BLE wearable networks, synchronized multimodal acquisition system.
-- [ ] Old-site items **not turned into devices**: software licences (eye tracking, EEG, motion capture) and fit-out (mounting rails, UPS, displays, acoustic treatment, furniture). Do they belong on the site?
+- [x] The 34 items in the equipment inventory (Nov 2026) are in, as `status: installed` with their
+      `source` (Lab / PI collection / Shared at UiS / Via collaboration) and official product links.
+- [ ] **Responsible researcher** for every inventory item: all default to Florenc Demrozi (marked `# TODO`).
+- [ ] **Linked applications** for every inventory item were guessed by Claude (marked `# TODO`).
+- [ ] **Collaboration items** (Visual3D, Enobio 8, Polar H10, Tobii Pro Glasses 2, Meta Quest 2): the inventory
+      quantities are placeholders, so no quantity is shown. Add `quantity` once confirmed.
+- [ ] Sync capability (`sync`) is set only for OptiTrack and Delsys (hardware). Confirm the others (TTL / LSL).
+- [ ] Sample-rate labels in the home-page signal monitor (`src/content/categories/*.yaml`, `signal.rate`): only
+      OptiTrack (up to 360 Hz), Delsys (≈ 2 kHz), Neon (200 Hz) and the B310 (≤ 7.2 GHz) are shown. Confirm or add.
+- [ ] Replaced by real inventory items and deleted: wireless EMG, smartwatches, eye-tracking glasses, thermal/optical
+      cameras, GPU workstation, edge-AI nodes, mobile EEG, ECG wearables.
+- [ ] **13 wish-list devices remain `planned` + `placeholder: true`** (force platforms, smart insoles, Xsens, markerless
+      depth cameras, open-source EEG, screen eye tracker, microphone array, wearable microphones, UWB, ISAC testbed,
+      low-field MRI, POCUS, research storage). Keep, confirm or delete each; researchers and applications are guesses.
+- [ ] Device photos (our own; no manufacturer images). Until then cards use icons.
 
 ## Text
+
+- [ ] Home-page copy in `src/content/home.yaml` (hero intro, "what makes the lab different", pipeline steps) was
+      drafted by Claude from the inventory notes. Review it.
 
 - [ ] §3.4 paragraph "from the original brief" (after "Humans are inherently multimodal…"). The original brief is not in the repo.
 - [ ] §3.7 paragraph "from the original brief" (Collaborate section).
 - [ ] One-sentence descriptions for the 12 applications (`src/content/applications/*.yaml`; Claude drafted them as placeholders).
 - [ ] Review the About page (`src/content/pages/en/about.md`), carried over and lightly edited from the old site.
 - [ ] Official accessibility statement (`src/content/pages/en/accessibility.md` is a draft; it should link to uustatus.no).
-- [ ] Norwegian: modality and application names, UI strings (`src/i18n/ui.ts`) and the tagline "Måle. Forstå. Forbedre liv." were drafted by Claude and **need review by a native speaker**. No Norwegian versions of pages or device texts yet.
+- [ ] Norwegian: category and application names, the full lab name ("Laboratorium for multimodal KI og biomedisinsk dataanalyse"), UI strings (`src/i18n/ui.ts`) and the tagline "Måle. Forstå. Forbedre liv." were drafted by Claude and **need review by a native speaker**. No Norwegian versions of pages or device texts yet.
 
 ## People — `src/content/researchers/`
 
@@ -53,6 +62,7 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 
 ## Open questions (REQUIREMENTS §8)
 
-- [ ] Hosting and domain (the deploy workflow currently targets GitHub Pages).
+- [ ] Hosting and domain: the name is now `m2ai-lab`. Rename the GitHub repository (currently `mai-lab`) to
+      `m2ai-lab` so GitHub Pages serves it at `/m2ai-lab/`; a custom domain (e.g. a uis.no subdomain) still needs UiS IT.
 - [ ] Is Norwegian needed at launch?
 - [ ] Is equipment booking in scope later?

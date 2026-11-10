@@ -1,0 +1,6 @@
+name: { en: "Connectivity, power & storage", no: "Tilkobling, strøm og lagring" }
+short: "INFRA"
+subtitle: { en: "Bluetooth adapters, field power and storage that keep mobile recordings running." }
+icon: plug
+featured: false
+order: 9

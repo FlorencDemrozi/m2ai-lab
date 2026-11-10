@@ -1,9 +1,9 @@
 {
-  "name": "mmai-lab-website",
+  "name": "m2ai-lab-website",
   "private": true,
   "type": "module",
   "version": "0.1.0",
-  "description": "Website for the MMAI Lab — Multimodal AI Lab, University of Stavanger",
+  "description": "Website for the m²AI BMD Lab — Multimodal AI Biomedical Data Analysis Laboratory, University of Stavanger",
   "engines": {
     "node": ">=22.12.0"
   },

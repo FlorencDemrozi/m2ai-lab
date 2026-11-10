@@ -1,6 +1,6 @@
 ---
 title: About the lab
-description: Why the MMAI Lab exists, who it serves, and where it is going.
+description: Why the m²AI BMD Lab exists, who it serves, and where it is going.
 ---
 
 ## Why a dedicated lab

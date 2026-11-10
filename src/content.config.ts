@@ -1,5 +1,5 @@
 /**
- * Content schemas for the MMAI Lab site.
+ * Content schemas for the m²AI BMD Lab site.
  *
  * Every lab-specific fact lives in src/content/ and is validated here at build time.
  * Relations are stored on ONE side only (see README "Content model"); reverse links
@@ -8,7 +8,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { STATUSES, SYNC } from './lib/constants';
+import { SOURCES, STATUSES, SYNC } from './lib/constants';
 
 
 /** A text field with English and optional Norwegian. A plain string means English only. */
@@ -33,9 +33,15 @@ const devices = defineCollection({
       }),
       /** For `acquiring`: when it is expected, e.g. "2027-01" or "Q1 2027". */
       expected: z.string().optional(),
-      modalities: z
-        .array(reference('modalities'))
-        .min(1, 'Every device needs at least one modality (`modalities: [id]`).'),
+      /** Where the item comes from: lab | personal | shared-uis | collaboration. */
+      source: z.enum(SOURCES, {
+        error: (issue) => `Unknown source "${String(issue.input)}". Use lab | personal | shared-uis | collaboration.`,
+      }).default('lab'),
+      /** For shared-uis / collaboration: the lab that makes it available. */
+      partner: localized.optional(),
+      categories: z
+        .array(reference('categories'))
+        .min(1, 'Every device needs at least one category (`categories: [id]`).'),
       researchers: z
         .array(reference('researchers'), {
           error: 'Every device needs `researchers: [id, ...]` (at least one responsible researcher).',
@@ -45,6 +51,14 @@ const devices = defineCollection({
       manufacturer: z.string().optional(),
       model: z.string().optional(),
       quantity: z.number().int().positive().optional(),
+      /** Shown instead of a number when the quantity varies, e.g. "Various" or "1 licence". */
+      quantity_note: localized.optional(),
+      /** Official product page, shown as a "More info" button. Never hotlink its images. */
+      url: z.url().optional(),
+      /** Icon key (src/components/Icon.astro). Defaults to the first category's icon. */
+      icon: z.string().optional(),
+      /** Accessories (straps, cables, adapters) are listed compactly, not as full cards on the home page. */
+      accessory: z.boolean().default(false),
       specs: z.record(z.string(), z.unknown()).default({}),
       sync: z.enum(SYNC).default('unknown'),
       acquired: z.coerce.date().optional(),
@@ -59,14 +73,49 @@ const devices = defineCollection({
     }),
 });
 
-const modalities = defineCollection({
-  loader: glob({ pattern: '**/*.yaml', base: './src/content/modalities' }),
+/** Equipment categories: filter tags on the equipment page and the home-page tiles. */
+const categories = defineCollection({
+  loader: glob({ pattern: '**/*.yaml', base: './src/content/categories' }),
   schema: z.object({
     name: localized,
+    /** Short name for signal lanes and filter chips, e.g. "EMG". */
+    short: z.string(),
     subtitle: localized,
     /** Icon key, see src/components/Icon.astro. */
     icon: z.string(),
+    /** false keeps it off the home-page tiles and the signal monitor (e.g. cables and power). */
+    featured: z.boolean().default(true),
+    /** Signal-monitor lane: trace shape and the rate label shown next to it. */
+    signal: z
+      .object({
+        shape: z.enum(['mocap', 'emg', 'eeg', 'gaze', 'thermal', 'rf', 'imu', 'audio', 'pulse']),
+        rate: z.string().optional(),
+      })
+      .optional(),
     order: z.number(),
+  }),
+});
+
+/** Copy for the home page sections (lab facts, so it lives in content, not components). */
+const home = defineCollection({
+  loader: file('./src/content/home.yaml'),
+  schema: z.object({
+    hero_intro: localized,
+    sync_label: localized,
+    highlights: z
+      .array(z.object({ device: reference('devices'), label: localized }))
+      .default([]),
+    unique_eyebrow: localized,
+    unique_heading: localized,
+    unique_body: localized,
+    pipeline: z.array(z.object({ title: localized, body: localized, icon: z.string() })).min(1),
+    categories_heading: localized,
+    categories_intro: localized,
+    applications_heading: localized,
+    researchers_heading: localized,
+    collaborate_heading: localized,
+    collaborate_body: localized,
+    placeholder_fields: z.array(z.string()).default([]),
   }),
 });
 
@@ -154,6 +203,7 @@ const settings = defineCollection({
   loader: file('./src/content/settings.yaml'),
   schema: z.object({
     lab_name: z.string(),
+    lab_slug: z.string().regex(/^[a-z0-9-]+$/),
     lab_full_name: localized,
     tagline: localized,
     lab_email: z.email(),
@@ -181,7 +231,8 @@ const pages = defineCollection({
 
 export const collections = {
   devices,
-  modalities,
+  categories,
+  home,
   applications,
   researchers,
   projects,

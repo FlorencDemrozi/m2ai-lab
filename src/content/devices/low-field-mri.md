@@ -3,7 +3,7 @@ name: { en: "Portable low-field MRI" }
 summary: { en: "Structural and functional neuroimaging outside a traditional MRI suite." }
 # PLACEHOLDER: status, responsible researcher(s) and applications are guesses — confirm (TODO-content.md)
 status: planned
-modalities: [medical-clinical]
+categories: [medical-imaging]
 researchers: [mahdieh-khanmohammadi, ketil-oppedal]
 applications: [parkinsons, digital-biomarkers, aging-aal]
 twin_object: low_field_mri

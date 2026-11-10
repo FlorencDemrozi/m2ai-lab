@@ -1,4 +1,0 @@
-name: { en: "Localization & connectivity", no: "Lokalisering og tilkobling" }
-subtitle: { en: "UWB real-time localization, BLE wearable networks, IoT/IoMT and 5G–6G experimentation." }
-icon: location
-order: 5

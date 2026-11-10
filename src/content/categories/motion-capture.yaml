@@ -1,0 +1,6 @@
+name: { en: "Motion capture & body tracking", no: "Bevegelsesfangst og kroppssporing" }
+short: "MOCAP"
+subtitle: { en: "OptiTrack optical motion capture with sub-millimetre accuracy: the lab's ground truth, plus inside-out trackers for VR and outside the volume." }
+icon: motion
+signal: { shape: mocap, rate: "up to 360 Hz" }
+order: 1

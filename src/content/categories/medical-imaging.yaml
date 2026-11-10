@@ -1,0 +1,6 @@
+name: { en: "Medical imaging", no: "Medisinsk avbildning" }
+short: "MED"
+subtitle: { en: "Portable ultrasound and low-field imaging for clinical-grade biomedical acquisition." }
+icon: medical
+featured: false
+order: 11

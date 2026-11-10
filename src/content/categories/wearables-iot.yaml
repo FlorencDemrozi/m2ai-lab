@@ -1,0 +1,6 @@
+name: { en: "Wearables & IoT", no: "Kroppsnære sensorer og IoT" }
+short: "WEAR"
+subtitle: { en: "Smartwatches, sensory earbuds and programmable IoT platforms for everyday-life sensing and on-device machine learning." }
+icon: watch
+signal: { shape: imu }
+order: 8

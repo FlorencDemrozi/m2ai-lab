@@ -1,6 +1,7 @@
-# MMAI Lab website
+# m²AI BMD Lab website
 
-Website for the **MMAI Lab — Multimodal AI Lab** at the University of Stavanger.
+Website for the **m²AI BMD Lab — Multimodal AI Biomedical Data Analysis Laboratory** at the University of Stavanger
+(URL-safe name / repository / domain: `m2ai-lab`).
 *Sensing. Understanding. Improving Lives.*
 
 A static site built with [Astro](https://astro.build). All lab content lives as one file
@@ -51,12 +52,18 @@ name: { en: "Wireless EMG system", no: "Trådløst EMG-system" }
 summary: { en: "Muscle activity synchronized with motion capture." }
 status: installed            # required: installed | acquiring | planned | retired
 expected: "2027-01"          # optional, shown for `acquiring`
-modalities: [physiological-neural, motion-biomechanics]   # required, ≥ 1
+source: lab                  # lab | personal | shared-uis | collaboration (default lab)
+partner: { en: "Cognitive and Sports Lab, UiS" }   # for shared-uis / collaboration
+categories: [emg]            # required, ≥ 1; the first one is where it is listed
 researchers: [morteza-esmaeili]                           # required, ≥ 1
 applications: [gait, rehabilitation]
 manufacturer: "Delsys"
 model: "Trigno"
 quantity: 16
+quantity_note: { en: "Various" }   # instead of a number
+url: https://delsys.com/     # official product page → "More info" button
+icon: muscle                 # optional, defaults to the category icon
+accessory: true              # optional: straps, cables, power → compact card
 specs: { channels: 16, "sample rate": "2 kHz" }
 sync: hardware               # hardware | software | none | unknown
 acquired: 2026-11-15
@@ -135,7 +142,8 @@ researchers: [florenc-demrozi]
 
 | File | What it holds |
 |---|---|
-| `src/content/modalities/<id>.yaml` | The seven modality tiles: name, subtitle, icon key, order |
+| `src/content/categories/<id>.yaml` | Equipment categories (filter tags, home tiles, signal lanes): name, short, subtitle, icon, featured, signal, order |
+| `src/content/home.yaml` | Home-page copy: hero intro, highlights, pipeline steps, collaborate text |
 | `src/content/zones/<id>.yaml` | Floor areas (e.g. the OptiTrack volume) in metres, with their devices |
 | `src/content/settings.yaml` | Lab name, tagline, shared email, address, social links |
 | `src/content/pages/<en\|no>/<page>.md` | Free-text pages (About, Accessibility). A missing `no` file falls back to `en` |

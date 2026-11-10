@@ -1,0 +1,5 @@
+name: { en: "Computing & edge AI", no: "Databehandling og edge-KI" }
+short: "COMPUTE"
+subtitle: { en: "A GPU workstation for acquisition, PC-VR and training, and edge AI computers for real-time inference on site." }
+icon: compute
+order: 7

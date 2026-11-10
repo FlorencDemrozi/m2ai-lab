@@ -1,5 +1,7 @@
 # MMAI Lab Website — Requirements Brief
 
+> **Name change (2026-11):** the lab is now the **m²AI BMD Lab — Multimodal AI Biomedical Data Analysis Laboratory** (URL-safe `m2ai-lab`). Read "MMAI Lab" below as the old name.
+
 Oct 2, 2026 · @Florenc
 
 ## 1. Purpose and scope

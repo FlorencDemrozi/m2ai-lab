@@ -1,0 +1,15 @@
+---
+/**
+ * The lab name as a wordmark. The name comes from settings.yaml; a "²" in it is
+ * highlighted (it is a real character, so the plain text still reads "m²AI BMD Lab").
+ */
+interface Props { name: string; class?: string }
+const { name, class: cls } = Astro.props;
+const [head, ...rest] = name.split('²');
+const tail = rest.join('²');
+---
+<span class:list={['wordmark', cls]}>{rest.length ? <>{head}<span class="sq">²</span>{tail}</> : name}</span>
+<style>
+  .wordmark { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; white-space: nowrap; }
+  .sq { color: var(--accent); }
+</style>

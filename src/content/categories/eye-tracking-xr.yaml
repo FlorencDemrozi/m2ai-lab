@@ -1,0 +1,6 @@
+name: { en: "Eye tracking & XR", no: "Øyesporing og XR" }
+short: "GAZE"
+subtitle: { en: "Calibration-free wearable eye tracking, egocentric research glasses and VR headsets with built-in eye tracking." }
+icon: vision
+signal: { shape: gaze, rate: "200 Hz" }
+order: 4

@@ -1,0 +1,6 @@
+name: { en: "Brain activity (EEG)", no: "Hjerneaktivitet (EEG)" }
+short: "EEG"
+subtitle: { en: "Research EEG from 8 to 64 channels, through shared UiS facilities and our collaboration partners." }
+icon: brain
+signal: { shape: eeg }
+order: 3

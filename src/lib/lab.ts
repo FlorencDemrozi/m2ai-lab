@@ -7,16 +7,17 @@
  * that every referenced id actually exists. Any broken link fails the build.
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { STATUSES } from './constants';
+import { SOURCES, STATUSES } from './constants';
 
 export type Device = CollectionEntry<'devices'>;
 export type Researcher = CollectionEntry<'researchers'>;
 export type Application = CollectionEntry<'applications'>;
-export type Modality = CollectionEntry<'modalities'>;
+export type Category = CollectionEntry<'categories'>;
 export type Project = CollectionEntry<'projects'>;
 export type Publication = CollectionEntry<'publications'>;
 export type Zone = CollectionEntry<'zones'>;
 export type Status = (typeof STATUSES)[number];
+export type Source = (typeof SOURCES)[number];
 export type StatusCounts = Record<Exclude<Status, 'retired'>, number>;
 
 type Ref = { id: string };
@@ -37,28 +38,29 @@ function group<K extends string, V>(pairs: Array<[K, V]>): Map<K, V[]> {
 }
 
 async function build() {
-  const [devices, researchers, applications, modalities, projects, publications, zones, settingsAll] =
+  const [devices, researchers, applications, categories, projects, publications, zones, settingsAll, homeAll] =
     await Promise.all([
       getCollection('devices'),
       getCollection('researchers'),
       getCollection('applications'),
-      getCollection('modalities'),
+      getCollection('categories'),
       getCollection('projects'),
       getCollection('publications'),
       getCollection('zones'),
       getCollection('settings'),
+      getCollection('home'),
     ]);
 
   devices.sort(byOrder);
   researchers.sort(byOrder);
   applications.sort(byOrder);
-  modalities.sort(byOrder);
+  categories.sort(byOrder);
 
   const index = {
     devices: new Map(devices.map((e) => [e.id, e])),
     researchers: new Map(researchers.map((e) => [e.id, e])),
     applications: new Map(applications.map((e) => [e.id, e])),
-    modalities: new Map(modalities.map((e) => [e.id, e])),
+    categories: new Map(categories.map((e) => [e.id, e])),
     projects: new Map(projects.map((e) => [e.id, e])),
   };
 
@@ -74,7 +76,7 @@ async function build() {
   };
   for (const d of devices) {
     const f = `src/content/devices/${d.id}.md`;
-    check(f, 'modalities', d.data.modalities, 'modalities');
+    check(f, 'categories', d.data.categories, 'categories');
     check(f, 'researchers', d.data.researchers, 'researchers');
     check(f, 'applications', d.data.applications, 'applications');
   }
@@ -94,9 +96,12 @@ async function build() {
 
   const settings = settingsAll.find((s) => s.id === 'lab');
   if (!settings) errors.push('src/content/settings.yaml must contain one entry with the id "lab".');
+  const home = homeAll.find((h) => h.id === 'home');
+  if (!home) errors.push('src/content/home.yaml must contain one entry with the id "home".');
+  else check('src/content/home.yaml', 'highlights', home.data.highlights.map((h) => h.device), 'devices');
 
   if (errors.length) {
-    throw new Error(`MMAI content check failed (${errors.length}):\n  - ${errors.join('\n  - ')}`);
+    throw new Error(`Content check failed (${errors.length}):\n  - ${errors.join('\n  - ')}`);
   }
 
   // ---- build log notes ---------------------------------------------------------------
@@ -105,19 +110,19 @@ async function build() {
   for (const d of devices) {
     const obj = d.data.twin_object;
     if (!obj) notInTwin.push(d.id);
-    else if (twinSeen.has(obj)) console.warn(`[mmai] twin_object "${obj}" is used by both ${twinSeen.get(obj)} and ${d.id}.`);
+    else if (twinSeen.has(obj)) console.warn(`[m2ai] twin_object "${obj}" is used by both ${twinSeen.get(obj)} and ${d.id}.`);
     else twinSeen.set(obj, d.id);
   }
-  if (notInTwin.length) console.warn(`[mmai] Not shown in the digital twin (no twin_object): ${notInTwin.join(', ')}`);
+  if (notInTwin.length) console.warn(`[m2ai] Not shown in the digital twin (no twin_object): ${notInTwin.join(', ')}`);
   const ph = [...devices, ...researchers, ...applications].filter((e) => e.data.placeholder).length;
-  if (ph) console.warn(`[mmai] ${ph} content files are marked placeholder: true (see TODO-content.md).`);
+  if (ph) console.warn(`[m2ai] ${ph} content files are marked placeholder: true (see TODO-content.md).`);
 
   // ---- reverse relations -------------------------------------------------------------
   const resolve = <T>(refs: Ref[], m: Map<string, T>) => refs.map((r) => m.get(r.id)!);
 
   const devicesByResearcher = group(devices.flatMap((d) => d.data.researchers.map((r) => [r.id, d] as [string, Device])));
   const devicesByApplication = group(devices.flatMap((d) => d.data.applications.map((a) => [a.id, d] as [string, Device])));
-  const devicesByModality = group(devices.flatMap((d) => d.data.modalities.map((m) => [m.id, d] as [string, Device])));
+  const devicesByCategory = group(devices.flatMap((d) => d.data.categories.map((c) => [c.id, d] as [string, Device])));
   const projectsByDevice = group(projects.flatMap((p) => p.data.devices.map((d) => [d.id, p] as [string, Project])));
   const projectsByResearcher = group(projects.flatMap((p) => p.data.researchers.map((r) => [r.id, p] as [string, Project])));
   const projectsByApplication = group(projects.flatMap((p) => p.data.applications.map((a) => [a.id, p] as [string, Project])));
@@ -143,13 +148,17 @@ async function build() {
     labDevices: inLab(devices),
     researchers,
     applications,
-    modalities,
+    categories,
+    featuredCategories: categories.filter((c) => c.data.featured),
+    home: home!.data,
     projects,
     publications,
     zones,
 
     device: {
-      modalities: (d: Device) => resolve(d.data.modalities, index.modalities),
+      categories: (d: Device) => resolve(d.data.categories, index.categories),
+      /** Icon key: the device's own, else its first category's. */
+      icon: (d: Device) => d.data.icon ?? index.categories.get(d.data.categories[0].id)?.data.icon ?? 'compute',
       researchers: (d: Device) => resolve(d.data.researchers, index.researchers),
       applications: (d: Device) => resolve(d.data.applications, index.applications),
       projects: (d: Device) => projectsByDevice.get(d.id) ?? [],
@@ -166,9 +175,10 @@ async function build() {
       researchers: (a: Application) => researchersOfDevices(inLab(devicesByApplication.get(a.id))),
       projects: (a: Application) => projectsByApplication.get(a.id) ?? [],
     },
-    modality: {
-      devices: (m: Modality) => inLab(devicesByModality.get(m.id)),
+    category: {
+      devices: (c: Category) => inLab(devicesByCategory.get(c.id)),
     },
+    byId: (id: string) => index.devices.get(id),
     project: {
       publications: (p: Project) => pubsByProject.get(p.id) ?? [],
     },
@@ -189,4 +199,9 @@ export function statusCounts(list: Device[]): StatusCounts {
   const c: StatusCounts = { installed: 0, acquiring: 0, planned: 0 };
   for (const d of list) if (d.data.status !== 'retired') c[d.data.status]++;
   return c;
+}
+
+/** Devices that can be used now (status `installed`), optionally excluding accessories. */
+export function available(list: Device[], { accessories = true } = {}) {
+  return list.filter((d) => d.data.status === 'installed' && (accessories || !d.data.accessory));
 }

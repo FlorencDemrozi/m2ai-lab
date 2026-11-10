@@ -1,0 +1,6 @@
+name: { en: "Radio-frequency sensing", no: "Radiofrekvent sensing" }
+short: "RF"
+subtitle: { en: "Software-defined radios up to 7.2 GHz for contactless RF and wireless sensing research." }
+icon: rf
+signal: { shape: rf, rate: "≤ 7.2 GHz" }
+order: 6

@@ -1,0 +1,6 @@
+name: { en: "Muscle activity (EMG)", no: "Muskelaktivitet (EMG)" }
+short: "EMG"
+subtitle: { en: "Research-grade wireless surface EMG with integrated IMUs, dry-electrode armbands and wearable physiological sensors." }
+icon: muscle
+signal: { shape: emg, rate: "≈ 2 kHz" }
+order: 2

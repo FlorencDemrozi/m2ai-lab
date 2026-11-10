@@ -2,9 +2,11 @@
 /**
  * The one device card used everywhere: lists, application views and (Phase 2–3) the
  * digital-twin hotspot/3D layers. Content comes only from the device file.
+ * data-* attributes drive the equipment filter (src/pages/[...locale]/devices/index.astro).
  */
 import Icon from './Icon.astro';
 import StatusBadge from './StatusBadge.astro';
+import SourceBadge from './SourceBadge.astro';
 import Email from './Email.astro';
 import type { Device, Lab } from '../lib/lab';
 import { href, pick, useT, type Locale } from '../i18n/ui';
@@ -14,40 +16,68 @@ interface Props {
   locale: Locale;
   /** Heading level for the device name, to keep the page outline correct. */
   level?: 2 | 3 | 4;
+  /** Compact: no applications or people (accessories, dense lists). */
+  compact?: boolean;
 }
-const { device, lab, locale, level = 3 } = Astro.props;
+const { device, lab, locale, level = 3, compact = false } = Astro.props;
 const t = useT(locale);
 const d = device.data;
 const H = `h${level}` as 'h2' | 'h3' | 'h4';
-const apps = lab.device.applications(device);
-const people = lab.device.researchers(device);
+const apps = compact ? [] : lab.device.applications(device).slice(0, 3);
+const people = compact ? [] : lab.device.researchers(device);
+const cats = lab.device.categories(device);
 const name = pick(d.name, locale);
+const qty = d.quantity ? `${d.quantity}×` : d.quantity_note ? pick(d.quantity_note, locale) : undefined;
 ---
-<article class="device-card" data-device={device.id} data-status={d.status} data-twin={d.twin_object}>
+<article
+  class:list={['device-card', { compact }]}
+  data-device={device.id}
+  data-status={d.status}
+  data-source={d.source}
+  data-categories={d.categories.map((c) => c.id).join(' ')}
+  data-twin={d.twin_object}
+>
   <div class="top">
-    <StatusBadge status={d.status} expected={d.expected} placeholder={d.placeholder} locale={locale} />
+    <span class="glyph" aria-hidden="true"><Icon name={lab.device.icon(device)} size={compact ? 22 : 26} /></span>
+    <p class="cat">{cats.map((c) => c.data.short).join(' · ')}</p>
+    {qty && <span class="qty">{qty}</span>}
   </div>
   <H class="name"><a href={href(locale, 'devices', device.id)}>{name}</a></H>
+  <p class="badges">
+    <StatusBadge status={d.status} expected={d.expected} placeholder={d.placeholder} locale={locale} />
+    <SourceBadge source={d.source} locale={locale} />
+  </p>
   <p class="summary">{pick(d.summary, locale)}</p>
+  {d.partner && <p class="partner">{t('device.partner')}: {pick(d.partner, locale)}</p>}
   {apps.length > 0 && (
     <ul class="tags" role="list" aria-label={t('device.applications')}>
       {apps.map((a) => <li><a class="tag" href={href(locale, 'applications', a.id)}>{pick(a.data.name, locale)}</a></li>)}
     </ul>
   )}
-  <ul class="people" role="list" aria-label={t('device.researchers')}>
-    {people.map((r) => (
-      <li>
-        <a href={href(locale, 'researchers', r.id)}>{r.data.name}</a>
-        {r.data.email && <Email address={r.data.email} label={t('researcher.emailTo', { name: r.data.name })} iconOnly />}
-      </li>
-    ))}
-  </ul>
-  <a class="more" href={href(locale, 'devices', device.id)} aria-label={`${t('device.more')}: ${name}`}>
-    {t('device.more')} <Icon name="arrow" size={18} />
-  </a>
+  {people.length > 0 && (
+    <ul class="people" role="list" aria-label={t('device.researchers')}>
+      {people.map((r) => (
+        <li>
+          <a href={href(locale, 'researchers', r.id)}>{r.data.name}</a>
+          {r.data.email && <Email address={r.data.email} label={t('researcher.emailTo', { name: r.data.name })} iconOnly />}
+        </li>
+      ))}
+    </ul>
+  )}
+  <div class="actions">
+    <a class="more" href={href(locale, 'devices', device.id)} aria-label={`${t('device.more')}: ${name}`}>
+      {t('device.more')} <Icon name="arrow" size={18} />
+    </a>
+    {d.url && (
+      <a class="ext" href={d.url} rel="noopener external" aria-label={`${t('device.url')}: ${name} (${t('device.urlHint')})`}>
+        {t('device.url')} <Icon name="external" size={16} />
+      </a>
+    )}
+  </div>
 </article>
 <style>
   .device-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -56,27 +86,58 @@ const name = pick(d.name, locale);
     border-radius: var(--radius);
     padding: var(--space-5);
     height: 100%;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+  .device-card:hover,
+  .device-card:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--glow) 25%, transparent), 0 12px 32px -12px color-mix(in srgb, var(--glow) 45%, transparent);
+  }
+  @media (hover: hover) {
+    .device-card:hover { transform: translateY(-2px); }
   }
   .device-card[data-status='planned'],
   .device-card[data-status='acquiring'] {
     border-style: dashed;
     border-color: var(--line-strong);
+    background: transparent;
+  }
+  .top { display: flex; align-items: center; gap: var(--space-3); }
+  .glyph {
+    display: grid; place-items: center; flex: none;
+    width: 44px; height: 44px; border-radius: 10px;
+    color: var(--accent);
+    background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--glow) 28%, transparent), transparent 70%), var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .compact .glyph { width: 36px; height: 36px; }
+  .cat {
+    margin: 0; flex: 1; min-width: 0;
+    font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: var(--ink-soft);
+  }
+  .qty {
+    font-family: var(--font-mono); font-size: var(--step--1); font-weight: 600;
+    color: var(--ink); background: var(--bg-sunken); border-radius: 6px; padding: 0.1em 0.5em;
+    white-space: nowrap; max-width: 12rem; overflow: hidden; text-overflow: ellipsis;
   }
   .name { margin: 0; font-size: var(--step-1); }
+  .compact .name { font-size: var(--step-0); }
   .name a { color: inherit; text-decoration: none; }
   .name a:hover { text-decoration: underline; }
-  .summary { margin: 0; color: var(--ink-soft); }
-  .people { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); list-style: none; margin: 0; padding: 0; }
+  .name a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; }
+  .summary { margin: 0; color: var(--ink-soft); font-size: var(--step--1); line-height: 1.55; }
+  .partner { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
+  .people { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); list-style: none; margin: 0; padding: 0; font-size: var(--step--1); }
   .people li { display: inline-flex; align-items: center; gap: var(--space-2); }
   .tags { list-style: none; margin: 0; padding: 0; }
-  .more {
-    margin-top: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-weight: 600;
-    text-decoration: none;
-    min-height: 44px;
+  /* Links and buttons inside the card sit above the stretched name link. */
+  .tags a, .people a, .actions a, .badges :global(*) { position: relative; z-index: 1; }
+  .actions { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); }
+  .more, .ext {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-weight: 600; text-decoration: none; min-height: 44px; font-size: var(--step--1);
   }
-  .more:hover { text-decoration: underline; }
+  .ext { color: var(--ink-soft); font-weight: 500; }
+  .more:hover, .ext:hover { text-decoration: underline; }
 </style>
