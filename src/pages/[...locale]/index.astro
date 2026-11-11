@@ -9,7 +9,6 @@ import Icon from '../../components/Icon.astro';
 import Wordmark from '../../components/Wordmark.astro';
 import SignalMonitor from '../../components/SignalMonitor.astro';
 import ResearcherCard from '../../components/ResearcherCard.astro';
-import Email from '../../components/Email.astro';
 import Twin2D from '../../twin/Twin2D.astro';
 import { available, loadLab } from '../../lib/lab';
 import { href, localePaths, pick, useT, type Locale } from '../../i18n/ui';
@@ -80,7 +79,7 @@ const org = {
         <p class="intro">{pick(h.hero_intro, locale)}</p>
         <p class="ctas">
           <a class="btn btn-primary" href={href(locale, 'devices')}>{t('home.explore')} <Icon name="arrow" size={18} /></a>
-          <Email address={s.lab_email} label={t('home.collaborate')} icon={false} class="btn btn-ghost" />
+          <a class="btn btn-ghost" href={href(locale, 'researchers')}>{t('home.collaborate')}</a>
         </p>
       </div>
       <div class="hero-visual">
@@ -186,8 +185,7 @@ const org = {
         <p>{pick(h.collaborate_body, locale)}</p>
       </div>
       <p class="collab-cta">
-        <Email address={s.lab_email} label={t('home.collaborate')} icon={false} class="btn btn-primary" />
-        <Email address={s.lab_email} class="collab-mail" />
+        <a class="btn btn-primary" href={href(locale, 'researchers')}>{t('home.collaborate')} <Icon name="arrow" size={18} /></a>
       </p>
     </div>
   </section>
@@ -312,6 +310,5 @@ const org = {
   .collab h2 { font-size: var(--step-3); max-width: 22ch; }
   .collab p { color: var(--ink-soft); max-width: 46rem; margin: 0; }
   .collab-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
-  .collab-cta :global(.collab-mail) { color: var(--ink); }
   @media (min-width: 56rem) { .collab { grid-template-columns: 1fr auto; } }
 </style>
