@@ -12,5 +12,6 @@ model: "Wireless PRO"
 quantity: 5
 specs: { per_set: "2 clip-on transmitters + 1 receiver", recording: "on-board backup recording in each transmitter", connection: "Direct Connect to phone or computer" }
 url: https://rode.com/en-int/about/news-info/direct-connect-wireless-pro-and-wireless-go
+twin_object: rode_wireless
 order: 140
 ---

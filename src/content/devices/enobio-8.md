@@ -13,5 +13,6 @@ model: "Enobio 8"
 # TODO: the inventory quantity for collaboration items is a placeholder; add `quantity` once confirmed.
 specs: { channels: 8 }
 url: https://www.neuroelectrics.com/
+twin_object: enobio_8
 order: 45
 ---

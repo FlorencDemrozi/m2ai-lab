@@ -13,5 +13,6 @@ quantity: 1
 url: https://myshop.vive.com/vive_eu/1920699.html
 icon: plug
 accessory: true
+twin_object: vive_wired_streaming_kit
 order: 57
 ---

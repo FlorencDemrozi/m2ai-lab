@@ -34,6 +34,9 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 - [ ] **DWL EX-Dop transcranial Doppler (TCD)** added as `acquiring` + `placeholder: true` (brain-health score).
       Confirm: expected date, responsible researcher (defaults to the PI), applications (guessed), quantity and official
       product link. It, low-field MRI and POCUS appear under "Beyond signals" in the home-page monitor (`home.yaml` → `beyond`).
+- [ ] **TI mmWave radar kit** added as `acquiring` (being purchased): 3 × AWR6843ISK radar + 3 × DCA1000EVM capture
+      card, on shelf unit 5. Confirm: expected date, responsible researcher (defaults to the PI), applications (guessed);
+      set to `installed` when they arrive.
 - [x] Control station: lab workstation with two 28-inch monitors (in its specs and in the twin).
 
 ## Text
@@ -65,8 +68,11 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 - [ ] Hero render and 2D isometric twin image (both from the same Blender model and camera).
 - [x] **2D twin layout** (`src/content/twin.yaml`) now follows `docs/Lab-Map.png` and `docs/UiS_Lab_Interactive_3D.html`.
 - [ ] Only **10 of the 12 OptiTrack cameras** have positions on the map; place the other 2.
-- [ ] Provisional positions in the twin: thermal tripods, USRP antenna stands, EMG dock and VR headset (shown on the
-      cabinets), and all planned devices.
+- [ ] Provisional positions in the twin: thermal tripods, USRP antenna stands and all planned devices (ISAC rack between
+      the north doors, low-field MRI in the south of the room). Every device is now in the twin: the east-wall storage is
+      drawn as 5 open shelf units, one per group (XR/eye tracking · EMG/IMU/EEG · wearables/IoT · audio/thermal/imaging/edge
+      · radar/storage/connectivity). Confirm the cabinets really are open shelves and which unit holds what. Visual3D is drawn as a
+      licence dongle on the control-station desk.
 - [ ] The 3D model also lists an **OptiTrack eSync 2**, a **PoE switch** and a **charging station**, which are not in the
       inventory. Add them as devices?
 - [ ] Logo subtitle says "Multimodal AI Lab"; the site's full name is "Multimodal AI Biomedical Data Analysis

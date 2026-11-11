@@ -13,5 +13,6 @@ model: "Quest 2"
 # TODO: the inventory quantity for collaboration items is a placeholder; add `quantity` once confirmed.
 url: https://www.meta.com/quest/
 icon: headset
+twin_object: meta_quest_2
 order: 67
 ---

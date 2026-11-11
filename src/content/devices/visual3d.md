@@ -14,5 +14,6 @@ model: "Visual3D"
 quantity_note: { en: "1 licence" }
 url: https://www.has-motion.com/
 icon: software
+twin_object: visual3d
 order: 28
 ---

@@ -11,5 +11,6 @@ manufacturer: "Nordic Semiconductor"
 quantity: 5
 url: https://www.nordicsemi.com/
 icon: chip
+twin_object: nordic_dev_kits
 order: 114
 ---

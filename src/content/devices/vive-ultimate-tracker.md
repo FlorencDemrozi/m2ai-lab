@@ -12,5 +12,6 @@ model: "Ultimate Tracker"
 quantity_note: { en: "1 kit: 3 trackers + 1 dongle" }
 url: https://myshop.vive.com/vive_no/1920634.html
 icon: tracker
+twin_object: vive_ultimate_tracker
 order: 20
 ---

@@ -13,5 +13,6 @@ quantity: 3
 url: https://www.tp-link.com/us/home-networking/bluetooth-reciever/ub600/
 icon: bluetooth
 accessory: true
+twin_object: tplink_ub600
 order: 120
 ---

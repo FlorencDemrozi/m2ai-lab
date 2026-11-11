@@ -220,7 +220,7 @@ const zones = defineCollection({
  * Shapes are drawn as isometric boxes until the Blender render replaces the drawing;
  * hotspots keep working either way. Objects without `object` are decoration.
  */
-const TWIN_KINDS = ['box', 'desk', 'workstation', 'pc', 'operator-desk', 'cabinets', 'tripod', 'rack', 'cart', 'plate', 'camera-array', 'anchors', 'person', 'scanner'] as const;
+const TWIN_KINDS = ['box', 'desk', 'workstation', 'pc', 'operator-desk', 'cabinets', 'shelves', 'tripod', 'rack', 'cart', 'plate', 'camera-array', 'anchors', 'person', 'scanner'] as const;
 const twin = defineCollection({
   loader: file('./src/content/twin.yaml'),
   schema: z.object({

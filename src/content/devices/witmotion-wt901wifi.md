@@ -13,5 +13,6 @@ quantity: 20
 specs: { axes: "9 (acc ±16 g, gyro ±2000 °/s, mag)", output: "Euler angles, quaternions", rate: "up to 200 Hz", link: "2.4 GHz WiFi (TCP/UDP)" }
 url: https://www.wit-motion.com/WirelessInclinometer/79.html
 icon: tracker
+twin_object: witmotion_wt901wifi
 order: 22
 ---

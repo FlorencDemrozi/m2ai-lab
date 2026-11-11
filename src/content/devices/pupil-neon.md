@@ -12,5 +12,6 @@ model: "Neon"
 quantity: 1
 url: https://pupil-labs.com/products/neon/shop?pid=ne_jan_hs
 icon: glasses
+twin_object: pupil_neon
 order: 50
 ---

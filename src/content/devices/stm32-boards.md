@@ -11,5 +11,6 @@ manufacturer: "STMicroelectronics"
 quantity_note: { en: "Various" }
 url: https://www.st.com/
 icon: chip
+twin_object: stm32_boards
 order: 116
 ---

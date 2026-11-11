@@ -11,5 +11,6 @@ manufacturer: "Built in-house"
 quantity: 100
 # TODO: which sensors are on board. See TODO-content.md.
 icon: bluetooth
+twin_object: ble_coin_sensors
 order: 118
 ---

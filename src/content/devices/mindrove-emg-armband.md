@@ -12,5 +12,6 @@ model: "EMG Armband 2"
 quantity: 2
 specs: { channels: 8, electrodes: "dry" }
 url: https://mindrove.com/product/emg-armband-2/
+twin_object: mindrove_emg_armband
 order: 35
 ---

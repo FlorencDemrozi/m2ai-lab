@@ -12,5 +12,6 @@ model: "Jetson Orin NX 16 GB"
 quantity: 1
 url: https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/
 icon: chip
+twin_object: jetson_orin_nx
 order: 92
 ---

@@ -9,5 +9,6 @@ categories: [eeg]
 researchers: [florenc-demrozi]
 applications: [digital-biomarkers, parkinsons, rehabilitation]
 quantity_note: { en: "Various" }
+twin_object: uis_eeg_systems
 order: 40
 ---

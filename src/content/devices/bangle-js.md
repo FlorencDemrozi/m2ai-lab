@@ -11,5 +11,6 @@ manufacturer: "Espruino"
 model: "Bangle.js"
 quantity: 5
 url: https://banglejs.com/
+twin_object: bangle_js
 order: 102
 ---

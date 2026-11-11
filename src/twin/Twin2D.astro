@@ -16,7 +16,7 @@ import SourceBadge from '../components/SourceBadge.astro';
 import Icon from '../components/Icon.astro';
 import type { Device, Lab } from '../lib/lab';
 import { href, pick, useT, type Locale } from '../i18n/ui';
-import { anchor, boxFaces, depth, floorRect, parts, project, pts, silhouette, type Box } from './iso';
+import { anchor, boxFaces, floorRect, paintOrder, parts, project, pts, silhouette, type Box } from './iso';
 import { twinData } from './sceneData';
 
 interface Props {
@@ -39,10 +39,8 @@ const items: Item[] = scene.objects
 
 const statusOf = (i: Item) => (i.device ? (i.device.data.status === 'installed' ? 'installed' : 'planned') : 'decor');
 
-// Painter's order over every box of every object.
-const drawn = items
-  .flatMap((i) => i.boxes.map((b) => ({ b, status: statusOf(i), id: i.device?.id })))
-  .sort((p, q) => depth(p.b) - depth(q.b));
+// Painter's order over every box of every object (dependency-sorted; see iso.ts).
+const drawn = paintOrder(items.flatMap((i) => i.boxes.map((b) => ({ b, status: statusOf(i), id: i.device?.id }))));
 
 // Hotspots in logical order: available first, then planned; each by device order.
 const hot = items

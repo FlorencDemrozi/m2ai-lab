@@ -12,5 +12,6 @@ manufacturer: "Shimmer"
 quantity_note: { en: "Various" }
 url: https://www.shimmersensing.com/
 icon: physio
+twin_object: shimmer_wearables
 order: 38
 ---

@@ -12,5 +12,6 @@ model: "Jetson Orin Nano Super + GMSL extension"
 quantity: 1
 url: https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/
 icon: chip
+twin_object: jetson_orin_nano_super
 order: 94
 ---

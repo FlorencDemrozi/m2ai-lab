@@ -12,5 +12,6 @@ model: "Pi 5 16 GB"
 quantity: 3
 url: https://www.raspberrypi.com/products/raspberry-pi-5/
 icon: chip
+twin_object: raspberry_pi_5
 order: 96
 ---

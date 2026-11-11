@@ -13,5 +13,6 @@ quantity_note: { en: "1 set" }
 url: https://myshop.vive.com/vive_no/1920635.html
 icon: tracker
 accessory: true
+twin_object: vive_trackstraps
 order: 25
 ---

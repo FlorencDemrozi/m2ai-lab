@@ -13,5 +13,6 @@ model: "H10"
 # TODO: the inventory quantity for collaboration items is a placeholder; add `quantity` once confirmed.
 url: https://www.polar.com/
 icon: physio
+twin_object: polar_h10
 order: 106
 ---

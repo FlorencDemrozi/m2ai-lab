@@ -14,5 +14,6 @@ specs: { LEDs: "dual, diffuse", brightness: "256 levels", control: "RS232, digit
 sync: hardware
 url: https://spectraldevices.com/collections/multispectral-led-illuminators
 icon: thermal
+twin_object: multispectral_led_illuminator
 order: 74
 ---

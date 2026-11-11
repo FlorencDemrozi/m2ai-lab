@@ -154,6 +154,22 @@ export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
       const boxes = Array.from({ length: n }, (_, i) => ({ x, y: y + i * step + 0.02, z, w, d: step - 0.04, h }));
       return one(boxes);
     }
+    case 'shelves': {
+      // Open shelving units side by side along y: four corner posts and SHELF_LEVELS boards each.
+      // Devices stand on the boards as their own objects (see shelfZ).
+      const n = o.count ?? 1;
+      const step = d / n;
+      const post = 0.03;
+      const boxes: Box[] = [];
+      for (let i = 0; i < n; i++) {
+        const uy = y + i * step + 0.02;
+        const ud = step - 0.04;
+        for (const [px, py] of [[x, uy], [x + w - post, uy], [x, uy + ud - post], [x + w - post, uy + ud - post]])
+          boxes.push({ x: px, y: py, z, w: post, d: post, h });
+        for (const bz of SHELF_LEVELS) boxes.push({ x, y: uy, z: z + bz, w, d: ud, h: 0.02 });
+      }
+      return one(boxes);
+    }
     case 'anchors': {
       const n = o.count ?? 4;
       const a = 0.14;
@@ -189,6 +205,9 @@ export function parts(o: SceneObject): { boxes: Box[]; groups: Box[][] } {
   }
 }
 
+/** Heights (m) of the shelf boards in a `shelves` unit; the top board sits at the unit's full height. */
+export const SHELF_LEVELS = [0.08, 0.48, 0.88, 1.28, 1.71];
+
 function deskBoxes(o: Box): Box[] {
   const { x, y, z, w, d, h } = o;
   const leg = 0.05;
@@ -203,6 +222,53 @@ function deskBoxes(o: Box): Box[] {
 
 /** Painter's order: far (small x+y) and low first. */
 export const depth = (b: Box) => b.x + b.w / 2 + (b.y + b.d / 2) + b.z * 0.01;
+
+/**
+ * Painter's order for isometric boxes. Sorting by centre depth alone fails for stacked
+ * objects (a device on a shelf board, with another board above it), so: wherever two boxes
+ * overlap on screen and are separated along an axis, the one on the far side (smaller x, y or
+ * z) is drawn first. Ties and the (rare) cycles fall back to centre depth.
+ */
+export function paintOrder<T extends { b: Box }>(items: T[]): T[] {
+  const n = items.length;
+  const bb = items.map(({ b }) => {
+    const c = corners(b);
+    const xs = c.map((p) => p[0]);
+    const ys = c.map((p) => p[1]);
+    return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  });
+  const dep = items.map(({ b }) => depth(b));
+  const next: number[][] = items.map(() => []);
+  const indeg = new Array(n).fill(0);
+  const e = 1e-6;
+  const edge = (from: number, to: number) => (next[from].push(to), indeg[to]++);
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const [a0, a1, a2, a3] = bb[i];
+      const [b0, b1, b2, b3] = bb[j];
+      if (a1 <= b0 + 0.5 || b1 <= a0 + 0.5 || a3 <= b2 + 0.5 || b3 <= a2 + 0.5) continue;
+      const A = items[i].b;
+      const B = items[j].b;
+      if (A.x + A.w <= B.x + e) edge(i, j);
+      else if (B.x + B.w <= A.x + e) edge(j, i);
+      else if (A.y + A.d <= B.y + e) edge(i, j);
+      else if (B.y + B.d <= A.y + e) edge(j, i);
+      else if (A.z + A.h <= B.z + e) edge(i, j);
+      else if (B.z + B.h <= A.z + e) edge(j, i);
+    }
+  }
+  const done = new Array(n).fill(false);
+  const out: T[] = [];
+  for (let k = 0; k < n; k++) {
+    let pick = -1;
+    for (let i = 0; i < n; i++) if (!done[i] && indeg[i] === 0 && (pick < 0 || dep[i] < dep[pick])) pick = i;
+    if (pick < 0) for (let i = 0; i < n; i++) if (!done[i] && (pick < 0 || dep[i] < dep[pick])) pick = i; // cycle
+    done[pick] = true;
+    out.push(items[pick]);
+    for (const t of next[pick]) indeg[t]--;
+  }
+  return out;
+}
 
 /** Silhouette (SVG points) for a group of boxes, slightly padded. */
 export function silhouette(group: Box[], pad = 4): string {

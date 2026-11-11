@@ -12,5 +12,6 @@ model: "Project Aria"
 quantity: 4
 url: https://www.projectaria.com/
 icon: glasses
+twin_object: project_aria
 order: 60
 ---

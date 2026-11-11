@@ -12,5 +12,6 @@ model: "Thingy:53"
 quantity: 2
 url: https://www.nordicsemi.com/Products/Development-hardware/Nordic-Thingy-53
 icon: chip
+twin_object: nordic_thingy_53
 order: 112
 ---

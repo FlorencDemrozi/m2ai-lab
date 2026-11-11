@@ -11,5 +11,6 @@ manufacturer: "OmniBuds"
 quantity_note: { en: "2 pairs" }
 url: https://www.omnibuds.tech/
 icon: earbuds
+twin_object: omnibuds
 order: 104
 ---

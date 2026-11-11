@@ -13,5 +13,6 @@ model: "Pro Glasses 2"
 # TODO: the inventory quantity for collaboration items is a placeholder; add `quantity` once confirmed.
 url: https://www.tobii.com/
 icon: glasses
+twin_object: tobii_pro_glasses_2
 order: 65
 ---

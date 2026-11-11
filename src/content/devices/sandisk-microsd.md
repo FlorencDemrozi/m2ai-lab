@@ -13,5 +13,6 @@ quantity: 3
 url: https://www.sandisk.com/
 icon: storage
 accessory: true
+twin_object: sandisk_microsd
 order: 124
 ---

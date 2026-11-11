@@ -8,5 +8,6 @@ categories: [wearables-iot]
 researchers: [florenc-demrozi]
 applications: [har, fall-detection, aging-aal, digital-biomarkers, wearable-ai, parkinsons]
 quantity: 15
+twin_object: smartwatches
 order: 100
 ---

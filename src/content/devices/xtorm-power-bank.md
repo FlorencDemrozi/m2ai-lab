@@ -13,5 +13,6 @@ quantity: 2
 url: https://www.xtorm.dk/products/power-bank-67w-27-000-mah-fuel-series-5-midnight-black
 icon: battery
 accessory: true
+twin_object: xtorm_power_bank
 order: 122
 ---

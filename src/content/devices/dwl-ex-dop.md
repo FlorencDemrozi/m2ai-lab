@@ -13,6 +13,7 @@ manufacturer: "DWL"
 model: "EX-Dop"
 icon: brain
 specs: { method: "Transcranial Doppler ultrasound (TCD)", output: "Cerebral blood-flow velocity → brain-health score" }
+twin_object: dwl_ex_dop
 order: 185
 placeholder: true
 ---
