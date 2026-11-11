@@ -121,6 +121,7 @@ const en = {
   'twin.hint3d': 'Drag to rotate, scroll to zoom (on touch screens: two fingers). Tab moves between devices, Enter opens details, Esc closes them.',
 
   'footer.contact': 'Contact',
+  'footer.contactResearchers': 'Contact a researcher',
   'footer.visit': 'Visit',
   'footer.accessibility': 'Accessibility statement',
   'footer.privacy': 'This site uses no cookies and no tracking.',
@@ -243,6 +244,7 @@ const no: Partial<Record<UiKey, string>> = {
   'twin.hint3d': 'Dra for å rotere, rull for å zoome (på berøringsskjerm: to fingre). Tab flytter mellom utstyr, Enter åpner detaljer, Esc lukker.',
 
   'footer.contact': 'Kontakt',
+  'footer.contactResearchers': 'Kontakt en forsker',
   'footer.visit': 'Besøk',
   'footer.accessibility': 'Tilgjengelighetserklæring',
   'footer.privacy': 'Nettstedet bruker ingen informasjonskapsler og ingen sporing.',

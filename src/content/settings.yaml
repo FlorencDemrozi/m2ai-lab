@@ -5,8 +5,7 @@ lab:
   lab_slug: "m2ai-lab"
   lab_full_name: { en: "Multimodal AI Biomedical Data Analysis Laboratory", no: "Laboratorium for multimodal KI og biomedisinsk dataanalyse" }
   tagline: { en: "Sensing. Understanding. Improving Lives.", no: "Måle. Forstå. Forbedre liv." }
-  # PLACEHOLDER: replace with the shared lab address when it exists
-  lab_email: florenc.demrozi@uis.no
+  # Shared lab email: add `lab_email: ...` here when one exists. Until then the footer links to the researchers page.
   institution: { en: "University of Stavanger", no: "Universitetet i Stavanger" }
   institution_url: https://www.uis.no/
   department: { en: "Department of Electrical Engineering and Computer Science (IDE)", no: "Institutt for data- og elektroteknologi (IDE)" }
@@ -25,4 +24,4 @@ lab:
       no: "Designet med ❤️ og ☕ ved Institutt for data- og elektroteknologi (IDE) av {name}, professor i biomedisinske sensorsystemer, Universitetet i Stavanger."
     name: "Florenc Demrozi"
     url: https://florencdemrozi.github.io/
-  placeholder_fields: [lab_email, address, tagline.no, lab_full_name.no]
+  placeholder_fields: [address, tagline.no, lab_full_name.no]

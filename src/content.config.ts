@@ -264,7 +264,8 @@ const settings = defineCollection({
     lab_slug: z.string().regex(/^[a-z0-9-]+$/),
     lab_full_name: localized,
     tagline: localized,
-    lab_email: z.email(),
+    /** Shared lab address; when absent, the footer points visitors to the researchers page. */
+    lab_email: z.email().optional(),
     institution: localized,
     institution_url: z.url(),
     department: localized,
