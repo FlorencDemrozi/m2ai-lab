@@ -30,8 +30,14 @@ jobs:
         run: npm run test:contrast
       - name: Internal links
         run: npm run test:links
+      # Retries: this step needs the Ubuntu package mirrors, which occasionally fail to resolve on the runner.
       - name: Install Chromium for axe
-        run: npx playwright install --with-deps chromium
+        run: |
+          for i in 1 2 3; do
+            npx playwright install --with-deps chromium && exit 0
+            echo "Install failed (attempt $i), retrying in 20 s…"; sleep 20
+          done
+          exit 1
       - name: Accessibility (axe, every page, light + dark)
         run: npm run test:a11y
       - name: Lighthouse (mobile, performance + accessibility ≥ 90)
