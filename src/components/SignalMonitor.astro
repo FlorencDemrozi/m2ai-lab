@@ -5,15 +5,33 @@
  * Pure SVG + CSS (no JS). Traces are generated at build time from each category's
  * `signal.shape`; they are illustrative, not recorded data. Static under reduced motion.
  * The categories section on the same page is the text equivalent.
+ *
+ * Under the lanes, "beyond signals": measures that are not time series (imaging, clinical
+ * scores), each a link to its device page with its status badge, drawn as small icons.
  */
-import type { Category } from '../lib/lab';
+import type { Category, Status } from '../lib/lab';
+import type { Locale } from '../i18n/ui';
+import StatusBadge from './StatusBadge.astro';
+
+export interface BeyondItem {
+  href: string;
+  visual: 'mri' | 'ultrasound' | 'tcd';
+  short: string;
+  label: string;
+  name: string;
+  status: Status;
+  expected?: string;
+}
 interface Props {
   lanes: Category[];
   label: string;
   syncLabel: string;
   liveLabel: string;
+  beyond?: BeyondItem[];
+  beyondLabel?: string;
+  locale: Locale;
 }
-const { lanes, label, syncLabel, liveLabel } = Astro.props;
+const { lanes, label, syncLabel, liveLabel, beyond = [], beyondLabel, locale } = Astro.props;
 
 const W = 600; // one period in SVG units; each SVG holds two periods and scrolls by one
 const H = 40;
@@ -85,8 +103,22 @@ function path(shape: string, seed: number) {
 const rows = lanes
   .filter((c) => c.data.signal)
   .map((c, i) => ({ id: c.id, short: c.data.short, rate: c.data.signal!.rate, d: path(c.data.signal!.shape, 17 + i * 101), color: `var(--sig-${(i % 7) + 1})` }));
+
+/** TCD: Doppler spectral envelope, three heartbeats (sharp systole, dicrotic notch, diastolic decay). */
+function tcdPath() {
+  const pts: string[] = [];
+  for (let i = 0; i <= 96; i++) {
+    const x = (i / 96) * 64;
+    const p = ((i / 96) * 3) % 1;
+    const v = p < 0.12 ? p / 0.12 : 0.42 + 0.58 * Math.exp(-(p - 0.12) / 0.07) + 0.12 * Math.exp(-((p - 0.34) ** 2) / 0.002) - 0.18 * p;
+    pts.push(`${x.toFixed(1)} ${(34 - v * 24).toFixed(1)}`);
+  }
+  return 'M' + pts.join('L');
+}
+const tcd = tcdPath();
 ---
-<div class="monitor" role="img" aria-label={label}>
+<div class="monitor">
+ <div role="img" aria-label={label}>
   <div class="chrome">
     <span class="dots"><i></i><i></i><i></i></span>
     <span class="live"><span class="pulse"></span>{liveLabel}</span>
@@ -110,6 +142,48 @@ const rows = lanes
     <span class="ticks" aria-hidden="true"></span>
     <span class="sync-label">{syncLabel}</span>
   </div>
+ </div>
+  {beyond.length > 0 && (
+    <div class="beyond">
+      <p class="beyond-label">{beyondLabel}</p>
+      <ul role="list">
+        {beyond.map((b) => (
+          <li>
+            <a href={b.href}>
+              <svg class="viz" viewBox="0 0 64 40" width="64" height="40" aria-hidden="true" focusable="false">
+                {b.visual === 'mri' && (
+                  <>
+                    <ellipse class="fill" cx="32" cy="20" rx="14" ry="17" />
+                    <ellipse cx="32" cy="20" rx="14" ry="17" />
+                    <path d="M32 4v32M21 11c3 2 3 5 0 7M43 11c-3 2-3 5 0 7M21 27c3-1 5 1 4 4M43 27c-3-1-5 1-4 4M29 15c-2 3-2 6 1 9M35 15c2 3 2 6-1 9" />
+                    <rect class="scan" x="16" y="3" width="32" height="1.6" />
+                  </>
+                )}
+                {b.visual === 'ultrasound' && (
+                  <>
+                    <path class="fill" d="M32 4L12 36A37.7 37.7 0 0 0 52 36Z" />
+                    <path d="M32 4L12 36A37.7 37.7 0 0 0 52 36Z" />
+                    <path class="soft" d="M24.6 15.9A14 14 0 0 0 39.4 15.9M19.3 24.4A24 24 0 0 0 44.7 24.4M16.6 29.1A29 29 0 0 0 47.4 29.1" />
+                    <ellipse class="dot" cx="35" cy="24" rx="4" ry="2.5" />
+                  </>
+                )}
+                {b.visual === 'tcd' && (
+                  <>
+                    <path class="fill" d={`${tcd}L64 34L0 34Z`} />
+                    <path d={tcd} />
+                    <path class="soft" d="M0 34.5h64" />
+                  </>
+                )}
+              </svg>
+              <span class="b-short">{b.short}</span>
+              <span class="b-label"><span class="sr-only">{b.name}: </span>{b.label}</span>
+              <StatusBadge status={b.status} expected={b.expected} locale={locale} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
 </div>
 <style>
   .monitor {
@@ -156,6 +230,27 @@ const rows = lanes
   }
   .sync-label { font-size: var(--text-xs); color: var(--ink); letter-spacing: 0.04em; white-space: nowrap; }
 
+  .beyond { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+  .beyond-label { margin: 0 0 var(--space-3); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+  .beyond ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+  .beyond a {
+    display: grid; gap: 0.35rem; align-content: start; justify-items: start; height: 100%;
+    padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+    color: var(--ink); text-decoration: none; font-family: var(--font-body);
+    transition: border-color 0.2s;
+  }
+  .beyond a:hover { border-color: var(--accent); }
+  .viz { width: 64px; height: 40px; overflow: visible; }
+  .viz path, .viz ellipse { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
+  .viz .fill { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: none; }
+  .viz .soft { stroke-opacity: 0.5; stroke-dasharray: 1.5 2.5; }
+  .viz .dot { fill: color-mix(in srgb, var(--accent) 45%, transparent); stroke: none; }
+  .viz .scan { fill: var(--accent); opacity: 0.8; animation: scan 3.5s ease-in-out infinite alternate; }
+  .b-short { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.1em; font-weight: 600; color: var(--accent); }
+  .b-label { font-size: 0.8rem; line-height: 1.35; color: var(--ink); }
+  @keyframes scan { to { transform: translateY(33px); } }
+
   @keyframes scroll { to { transform: translateX(-50%); } }
   @keyframes tick { to { background-position: -600px 0; } }
   @keyframes pulse {
@@ -170,7 +265,12 @@ const rows = lanes
     .sync { flex-direction: column; align-items: stretch; }
     .sync-label { white-space: normal; }
   }
+  @media (max-width: 40rem) {
+    .beyond ul { grid-template-columns: 1fr; }
+    .beyond a { grid-template-columns: 64px 1fr; column-gap: var(--space-3); }
+    .beyond a .viz { grid-row: span 3; align-self: center; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .trace svg, .ticks, .pulse { animation: none; }
+    .trace svg, .ticks, .pulse, .viz .scan { animation: none; }
   }
 </style>

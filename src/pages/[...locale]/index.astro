@@ -22,11 +22,35 @@ const s = lab.settings;
 const h = lab.home;
 
 const lanes = lab.featuredCategories.filter((c) => c.data.signal);
+const beyond = h.beyond
+  .map((x) => ({ x, d: lab.byId(x.device.id)! }))
+  .filter(({ d }) => d.data.status !== 'retired')
+  .map(({ x, d }) => ({
+    href: href(locale, 'devices', d.id),
+    visual: x.visual,
+    short: x.short,
+    label: pick(x.label, locale),
+    name: pick(d.data.name, locale),
+    status: d.data.status,
+    expected: d.data.expected,
+  }));
 const highlights = h.highlights
   .map((x) => ({ device: lab.byId(x.device.id)!, label: pick(x.label, locale) }))
   .filter((x) => x.device.data.quantity);
 const nowAvailable = available(lab.labDevices, { accessories: false });
-const tiles = lab.featuredCategories.map((c) => ({ c, items: available(lab.category.devices(c), { accessories: false }) }));
+// A category with nothing available yet (e.g. medical imaging) lists what is coming, with its status in the count line.
+const tiles = lab.featuredCategories.map((c) => {
+  const all = lab.category.devices(c).filter((d) => !d.data.accessory && d.data.status !== 'retired');
+  const items = available(all);
+  if (items.length) return { c, items, count: t('count.installed', { n: items.length }) };
+  const upcoming = all.toSorted((x, y) => (x.data.status === 'acquiring' ? -1 : 0) - (y.data.status === 'acquiring' ? -1 : 0));
+  const count = (['acquiring', 'planned'] as const)
+    .map((st) => [st, all.filter((d) => d.data.status === st).length] as const)
+    .filter(([, n]) => n > 0)
+    .map(([st, n]) => t(`count.${st}`, { n }))
+    .join(' · ');
+  return { c, items: upcoming, count: count || t('count.none') };
+});
 const apps = lab.applications.map((a) => ({ a, n: available(lab.application.devices(a)).length }));
 // Two full rows of five on desktop; everyone is on the researchers page.
 const people = lab.researchers.filter((r) => r.data.active).slice(0, 10);
@@ -65,6 +89,9 @@ const org = {
           label={t('home.monitor', { lanes: lanes.map((c) => pick(c.data.name, locale)).join(', ') })}
           syncLabel={pick(h.sync_label, locale)}
           liveLabel={t('home.live')}
+          beyond={beyond}
+          beyondLabel={pick(h.beyond_label, locale)}
+          locale={locale}
         />
       </div>
     </div>
@@ -106,7 +133,7 @@ const org = {
       <p class="lede">{pick(h.categories_intro, locale)}</p>
     </div>
     <ul class="grid-5 tiles" role="list">
-      {tiles.map(({ c, items }) => (
+      {tiles.map(({ c, items, count }) => (
         <li>
           <a class="tile" href={href(locale, 'categories', c.id)}>
             <span class="tile-top">
@@ -118,7 +145,7 @@ const org = {
             <span class="tile-items">
               {items.slice(0, 3).map((d) => <span>{pick(d.data.name, locale)}</span>)}
             </span>
-            <span class="tile-count">{t('count.installed', { n: items.length })} <Icon name="arrow" size={16} /></span>
+            <span class="tile-count">{count} <Icon name="arrow" size={16} /></span>
           </a>
         </li>
       ))}

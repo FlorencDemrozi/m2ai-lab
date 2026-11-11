@@ -105,6 +105,19 @@ const home = defineCollection({
     highlights: z
       .array(z.object({ device: reference('devices'), label: localized }))
       .default([]),
+    /** Hero monitor, under the signal lanes: what the lab measures besides time-series signals. */
+    beyond_label: localized,
+    beyond: z
+      .array(
+        z.object({
+          device: reference('devices'),
+          /** Small illustration drawn in the monitor. */
+          visual: z.enum(['mri', 'ultrasound', 'tcd']),
+          short: z.string(),
+          label: localized,
+        }),
+      )
+      .default([]),
     twin_heading: localized,
     twin_intro: localized,
     unique_eyebrow: localized,

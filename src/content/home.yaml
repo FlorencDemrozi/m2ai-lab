@@ -2,7 +2,7 @@
 # Norwegian is left out for now and falls back to English (TODO-content.md).
 home:
   hero_intro:
-    en: "We capture human behaviour, physiology and cognition at the same time: optical motion capture as ground truth, synchronized with muscle activity, brain activity, eye tracking, thermal imaging, radio-frequency sensing, XR and wearables, and processed on site with edge AI."
+    en: "We capture human behaviour, physiology and cognition at the same time: optical motion capture as ground truth, synchronized with muscle activity, brain activity, eye tracking, thermal imaging, radio-frequency sensing, XR and wearables, and processed on site with edge AI. We are also adding imaging and brain-health measures: low-field MRI, point-of-care ultrasound and transcranial Doppler (TCD)."
   sync_label: { en: "One clock · hardware TTL + Lab Streaming Layer", no: "Én klokke · maskinvare-TTL + Lab Streaming Layer" }
   highlights:
     - device: optitrack
@@ -11,6 +11,21 @@ home:
       label: { en: "wireless EMG + IMU sensors", no: "trådløse EMG- og IMU-sensorer" }
     - device: smartwatches
       label: { en: "smartwatches for everyday sensing", no: "smartklokker for hverdagsmåling" }
+  # Hero monitor, under the signal lanes: imaging and clinical scores (not time-series signals).
+  beyond_label: { en: "Beyond signals · imaging and brain-health scores", no: "Utover signaler · avbildning og hjernehelsemål" }
+  beyond:
+    - device: low-field-mri
+      visual: mri
+      short: "MRI"
+      label: { en: "Brain structure and function", no: "Hjernens struktur og funksjon" }
+    - device: pocus-ultrasound
+      visual: ultrasound
+      short: "ULTRASOUND"
+      label: { en: "Muscle, tendon and organ imaging", no: "Avbildning av muskler, sener og organer" }
+    - device: dwl-ex-dop
+      visual: tcd
+      short: "TCD"
+      label: { en: "Brain-health score from cerebral blood flow", no: "Hjernehelsescore fra blodstrømmen i hjernen" }
   twin_heading: { en: "Explore the Lab", no: "Utforsk laben" }
   twin_intro:
     en: "Room E-470, drawn from the floor plan: 8.9 × 8.77 m with a 5 × 8 m OptiTrack capture area (dashed) under a 2.6 m ceiling. Select a device to see what it is, whether it is available, and who to contact."

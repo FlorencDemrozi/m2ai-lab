@@ -1,6 +1,5 @@
 name: { en: "Medical imaging", no: "Medisinsk avbildning" }
 short: "MED"
-subtitle: { en: "Portable ultrasound and low-field imaging for clinical-grade biomedical acquisition." }
+subtitle: { en: "Portable ultrasound, low-field MRI and transcranial Doppler (TCD) for imaging and clinical-grade brain-health measures." }
 icon: medical
-featured: false
 order: 11

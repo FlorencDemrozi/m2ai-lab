@@ -31,6 +31,9 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 - [x] Wearable microphones placeholder replaced by the real item: 5 × RØDE Wireless PRO sets.
 - [x] Markerless depth cameras removed as a planned item: the PrimeX 22 cameras are dual mode (IR + depth), now in
       the OptiTrack entry.
+- [ ] **DWL EX-Dop transcranial Doppler (TCD)** added as `acquiring` + `placeholder: true` (brain-health score).
+      Confirm: expected date, responsible researcher (defaults to the PI), applications (guessed), quantity and official
+      product link. It, low-field MRI and POCUS appear under "Beyond signals" in the home-page monitor (`home.yaml` → `beyond`).
 - [x] Control station: lab workstation with two 28-inch monitors (in its specs and in the twin).
 
 ## Text
