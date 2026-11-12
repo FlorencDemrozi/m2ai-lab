@@ -11,8 +11,6 @@
  * drawing; the hotspot layer, cards and list stay as they are.
  */
 import DeviceCard from '../components/DeviceCard.astro';
-import StatusBadge from '../components/StatusBadge.astro';
-import SourceBadge from '../components/SourceBadge.astro';
 import Icon from '../components/Icon.astro';
 import type { Device, Lab } from '../lib/lab';
 import { href, pick, useT, type Locale } from '../i18n/ui';
@@ -208,29 +206,6 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
     <template data-cards>
       {listed.map((d) => <div data-card={d.id}><DeviceCard device={d} lab={lab} locale={locale} level={3} /></div>)}
     </template>
-
-    <h3 class="list-h" id="twin-list-h">{t('twin.list')}</h3>
-    <ul class="list" role="list" aria-labelledby="twin-list-h">
-      {listed.map((d) => (
-        <li data-status={d.data.status}>
-          <div class="row-main">
-            <a class="row-name" href={href(locale, 'devices', d.id)}>{name(d)}</a>
-            <span class="row-badges">
-              <StatusBadge status={d.data.status} expected={d.data.expected} placeholder={d.data.placeholder} locale={locale} />
-              <SourceBadge source={d.data.source} locale={locale} />
-            </span>
-          </div>
-          <p class="row-sum">{pick(d.data.summary, locale)}</p>
-          <p class="row-meta">
-            {lab.device.applications(d).map((a, k) => <>{k > 0 && ', '}<a href={href(locale, 'applications', a.id)}>{pick(a.data.name, locale)}</a></>)}
-            {lab.device.applications(d).length > 0 && <span aria-hidden="true"> · </span>}
-            {lab.device.researchers(d).map((r, k) => (
-              <>{k > 0 && ', '}<a href={href(locale, 'researchers', r.id)}>{r.data.name}</a></>
-            ))}
-          </p>
-        </li>
-      ))}
-    </ul>
   </div>
 </section>
 
@@ -374,20 +349,5 @@ const accessible = (d: Device) => `${name(d)} (${t(`status.${d.data.status}`)})`
   .key-planned { border: 1.5px dashed var(--status-planned); }
   .key-zone { background: color-mix(in srgb, var(--glow) 18%, transparent); border: 1.5px dashed var(--accent); }
 
-  .list-h { margin-top: var(--space-7); font-size: var(--step-1); }
-  .list { display: grid; gap: 0; border-top: 1px solid var(--line); }
-  .list li { padding: var(--space-3) 0; border-bottom: 1px solid var(--line); display: grid; gap: var(--space-1); }
-  .row-main { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
-  .row-name { font-weight: 600; }
-  .row-badges { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
-  .row-sum, .row-meta { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
-  .row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; }
-  .row-meta { gap: var(--space-1) 0.35em; }
-  /* WCAG 2.5.8: at least 24 px tall targets, with room between them. */
-  .row-meta :global(a) { color: var(--ink); display: inline-flex; align-items: center; min-height: 24px; padding-block: 2px; }
-  @media (min-width: 60rem) {
-    .list li { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); column-gap: var(--space-5); }
-    .row-main { grid-row: span 2; align-self: start; }
-  }
   @media (prefers-reduced-motion: reduce) { .outline { transition: none; } }
 </style>
