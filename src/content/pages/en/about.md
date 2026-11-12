@@ -23,6 +23,9 @@ The lab is anchored in IDE's Strategy 2026–2030, in two priority areas:
 Department secured the physical space, and the Head of Engineers committed technical
 support for installation, operation and maintenance.
 
+The lab is funded by the Faculty of Science and Technology through its **Veikart 4.0 (2026)**
+programme.
+
 ## Teaching and student research
 
 The lab gives students hands-on access to research-grade sensing equipment:

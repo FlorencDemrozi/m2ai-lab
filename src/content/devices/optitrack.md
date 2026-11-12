@@ -24,8 +24,7 @@ The volume can be split into smaller virtual zones for studies that need less sp
 TTL triggers and Lab Streaming Layer, so OptiTrack serves as the ground truth every other
 modality is validated against.
 
-The capture area is 5.0 × 8.0 m with a 2.6 m ceiling. The same open floor supports smaller
-studies, for example:
+The same open floor supports smaller studies, for example:
 
 - full-body gait analysis over the whole 5.0 × 8.0 m area
 - upper-body tests (arms, head) in about 3.0 × 3.0 m

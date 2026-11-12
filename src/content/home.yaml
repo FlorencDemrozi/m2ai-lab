@@ -28,7 +28,7 @@ home:
       label: { en: "Brain-health score from cerebral blood flow", no: "Hjernehelsescore fra blodstrømmen i hjernen" }
   twin_heading: { en: "Explore the Lab", no: "Utforsk laben" }
   twin_intro:
-    en: "Room E-470, drawn from the floor plan: 8.9 × 8.77 m with a 5 × 8 m OptiTrack capture area (dashed) under a 2.6 m ceiling. Select a device to see what it is, whether it is available, and who to contact."
+    en: "Room E-470, with the OptiTrack capture area shown dashed. Select a device to see what it is, whether it is available, and who to contact."
   unique_eyebrow: { en: "What makes the lab different", no: "Det som skiller laben" }
   unique_heading: { en: "Every modality, recorded at once, against one ground truth.", no: "Alle modaliteter, tatt opp samtidig, mot én fasit." }
   unique_body:

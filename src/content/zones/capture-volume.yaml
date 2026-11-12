@@ -1,5 +1,5 @@
 name: { en: "OptiTrack capture area", no: "OptiTrack opptaksområde" }
-description: { en: "5.0 × 8.0 m along the west side of E-470, under a 2.6 m ceiling." }
+description: { en: "Along the west side of E-470." }
 # From docs/Lab-Map.png (twin.yaml coordinates: origin north-west corner).
 rect: { x: 0.65, y: 0.40, width: 5, depth: 8 }
 devices: [optitrack]
