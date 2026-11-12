@@ -84,7 +84,7 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
 
 ## Settings — `src/content/settings.yaml`
 
-- [ ] Shared lab email address (none on the site now; footer and Collaborate buttons point to the researchers page).
+- [ ] Shared lab email address (none on the site now; footer links to the contact person set in settings.yaml).
 - [ ] Building name and postal address (currently "Kjølv Egelands hus, Kristine Bonnevies vei 22, 4021 Stavanger"; please confirm).
 - [ ] Visiting information.
 - [ ] Social links, if any.

@@ -97,6 +97,7 @@ async function build() {
 
   const settings = settingsAll.find((s) => s.id === 'lab');
   if (!settings) errors.push('src/content/settings.yaml must contain one entry with the id "lab".');
+  else check('src/content/settings.yaml', 'contact', [settings.data.contact], 'researchers');
   const home = homeAll.find((h) => h.id === 'home');
   if (!home) errors.push('src/content/home.yaml must contain one entry with the id "home".');
   else check('src/content/home.yaml', 'highlights', home.data.highlights.map((h) => h.device), 'devices');

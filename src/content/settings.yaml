@@ -5,7 +5,9 @@ lab:
   lab_slug: "m2ai-lab"
   lab_full_name: { en: "Multimodal AI Biomedical Data Analysis Laboratory", no: "Laboratorium for multimodal KI og biomedisinsk dataanalyse" }
   tagline: { en: "Sensing. Understanding. Improving Lives.", no: "Måle. Forstå. Forbedre liv." }
-  # Shared lab email: add `lab_email: ...` here when one exists. Until then the footer links to the researchers page.
+  # Contact person for the lab (researcher id); the footer links to their page.
+  contact: florenc-demrozi
+  # Shared lab email: add `lab_email: ...` here when one exists; it is then shown instead of the contact link.
   institution: { en: "University of Stavanger", no: "Universitetet i Stavanger" }
   institution_url: https://www.uis.no/
   department: { en: "Department of Electrical Engineering and Computer Science (IDE)", no: "Institutt for data- og elektroteknologi (IDE)" }

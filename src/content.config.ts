@@ -266,6 +266,8 @@ const settings = defineCollection({
     tagline: localized,
     /** Shared lab address; when absent, the footer points visitors to the researchers page. */
     lab_email: z.email().optional(),
+    /** Researcher id of the lab's contact person (footer, Partners page). */
+    contact: reference('researchers'),
     institution: localized,
     institution_url: z.url(),
     department: localized,

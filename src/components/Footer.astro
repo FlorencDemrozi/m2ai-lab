@@ -27,7 +27,7 @@ const [creditBefore, creditAfter = ''] = s.credit ? pick(s.credit.text, locale).
     </div>
     <div>
       <h2 class="h">{t('footer.contact')}</h2>
-      <p>{s.lab_email ? <Email address={s.lab_email} /> : <a href={href(locale, 'researchers')}>{t('footer.contactResearchers')}</a>}</p>
+      <p>{s.lab_email ? <Email address={s.lab_email} /> : <a href={href(locale, 'researchers', s.contact.id)}>{lab.researchers.find((r) => r.id === s.contact.id)?.data.name}</a>}</p>
       <ul role="list" class="small">
         <li><a href={href(locale, 'accessibility')}>{t('footer.accessibility')}</a></li>
         <li><a href={altHref} hreflang={other} lang={other}>{t('lang.switch')}</a></li>
