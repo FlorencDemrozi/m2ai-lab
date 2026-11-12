@@ -95,3 +95,9 @@ Tick items off as they arrive, and remove `placeholder: true` from the files you
       `m2ai-lab` so GitHub Pages serves it at `/m2ai-lab/`; a custom domain (e.g. a uis.no subdomain) still needs UiS IT.
 - [ ] Is Norwegian needed at launch?
 - [ ] Is equipment booking in scope later?
+
+## Partners page — `src/content/pages/en/partners.md`
+
+- [ ] Drafted by Claude (Nov 2026). Review the routes offered (lab use, equipment contributions, Industrial PhD,
+      public-sector PhD, Research Council projects, Horizon Europe, contract research) and the Industrial PhD summary
+      (taken from the 2026 call; update the link and figures when the next call opens). Remove `placeholder: true` when confirmed.

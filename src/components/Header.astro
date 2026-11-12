@@ -15,6 +15,7 @@ const links = [
   { href: href(locale, 'devices'), label: t('nav.equipment') },
   { href: href(locale, 'applications'), label: t('nav.applications') },
   { href: href(locale, 'researchers'), label: t('nav.researchers') },
+  { href: href(locale, 'partners'), label: t('nav.partners') },
   { href: href(locale, 'about'), label: t('nav.about') },
 ];
 const current = Astro.url.pathname;
@@ -49,7 +50,7 @@ const other = locale === 'en' ? 'nb' : 'en';
       <button class="theme" type="button" data-theme-toggle hidden aria-label={t('theme.toggle')}>
         <Icon name="sun" class="i-sun" /><Icon name="moon" class="i-moon" />
       </button>
-      <a class="btn btn-primary cta" href={href(locale, 'researchers')}>{t('nav.collaborate')}</a>
+      <a class="btn btn-primary cta" href={href(locale, 'partners')}>{t('nav.collaborate')}</a>
     </div>
   </div>
 </header>
